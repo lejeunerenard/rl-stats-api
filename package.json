@@ -1,0 +1,45 @@
+{
+  "name": "rl-stats-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "imports": {
+    "events": {
+      "bare": "bare-events"
+    },
+    "ws": {
+      "bare": "bare-ws"
+    }
+  },
+  "scripts": {
+    "start": "bare ./bin.js",
+    "format": "prettier . --write",
+    "test": "brittle-bare test/index.js",
+    "lint": "prettier . --check && lunte"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lejeunerenard/rl-stats-api.git"
+  },
+  "keywords": [],
+  "author": "Sean Zellmer <sean@lejeunerenard.com> (http://lejeunerenard.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lejeunerenard/rl-stats-api/issues"
+  },
+  "homepage": "https://github.com/lejeunerenard/rl-stats-api",
+  "type": "commonjs",
+  "dependencies": {
+    "bare-events": "^2.8.2",
+    "bare-logger": "^2.0.3",
+    "bare-ws": "^3.0.0",
+    "paparam": "^1.10.1",
+    "ready-resource": "^1.2.0"
+  },
+  "devDependencies": {
+    "brittle": "^3.19.0",
+    "lunte": "^1.2.0",
+    "prettier": "^3.6.2",
+    "prettier-config-holepunch": "^2.0.0"
+  }
+}
