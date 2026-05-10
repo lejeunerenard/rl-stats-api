@@ -1,5 +1,5 @@
 const ReadyResource = require('ready-resource')
-const { Socket } = require('ws')
+const net = require('net')
 const Log = require('bare-logger')
 
 const log = new Log()
@@ -11,7 +11,7 @@ module.exports = class RLStatsAPI extends ReadyResource {
     this.port = port
     this.host = host
 
-    const socket = new Socket({ port, host })
+    const socket = net.createConnection(port, host)
     this.socket = socket
     this.socket
       .on('error', (err) => this.emit('error', err))
