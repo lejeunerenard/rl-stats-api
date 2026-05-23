@@ -24,7 +24,7 @@ module.exports = class RLStatsAPI extends ReadyResource {
     pipeline(
       this.socket,
       new ParseJSONStream(),
-      this._emitEvent,
+      this._emitEvent.bind(this),
       (err) => {
         if (err) {
           console.error('stream err', err)
