@@ -7,17 +7,26 @@
     "events": {
       "bare": "bare-events"
     },
+    "fs": {
+      "bare": "bare-fs",
+      "default": "fs"
+    },
     "net": {
       "bare": "bare-net"
     },
-    "ws": {
-      "bare": "bare-ws"
+    "path": {
+      "bare": "bare-path",
+      "default": "path"
+    },
+    "stream": {
+      "bare": "bare-stream",
+      "default": "stream"
     }
   },
   "scripts": {
     "start": "bare ./bin.js",
     "format": "prettier . --write",
-    "test": "brittle-bare test/index.js",
+    "test": "brittle-bare test/all.js",
     "lint": "prettier . --check && lunte"
   },
   "repository": {
@@ -40,6 +49,9 @@
     "ready-resource": "^1.2.0"
   },
   "devDependencies": {
+    "bare-fs": "^4.7.1",
+    "bare-path": "^3.0.0",
+    "bare-stream": "^2.13.1",
     "brittle": "^3.19.0",
     "lunte": "^1.2.0",
     "prettier": "^3.6.2",
