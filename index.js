@@ -1,6 +1,6 @@
 const ReadyResource = require('ready-resource')
 const net = require('net')
-const parseJSONStream = require('./lib/json-parse-stream.js')
+const ParseJSONStream = require('./lib/json-parse-stream.js')
 const { pipeline } = require('stream')
 
 const log = console // new Log()
@@ -23,7 +23,7 @@ module.exports = class RLStatsAPI extends ReadyResource {
 
     pipeline(
       this.socket,
-      parseJSONStream(),
+      new ParseJSONStream(),
       this._emitEvent,
       (err) => {
         if (err) {
