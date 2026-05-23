@@ -14,24 +14,30 @@ module.exports = class RLStatsAPI extends ReadyResource {
     this.socket = socket
     this.socket
       .on('data', (data) => {
-	const jsonString = data.toString()
+        const jsonString = data.toString()
         try {
-	  const eventObj = JSON.parse(jsonString)
-	  const { Event, Data } = eventObj
-	  this.emit(Event, Data)
-	} catch (err) {
-	  log.error('connection:data json parsing jsonString', jsonString)
-	  log.error('connection:data json parsing error', err)
-	  if (err.message.match(/JSON at position \d/)) {
+          const eventObj = JSON.parse(jsonString)
+          const { Event, Data } = eventObj
+          this.emit(Event, Data)
+        } catch (err) {
+          log.error('connection:data json parsing jsonString', jsonString)
+          log.error('connection:data json parsing error', err)
+          if (err.message.match(/JSON at position \d/)) {
             const positionM = err.message.match(/JSON at position (\d+)/)
-	    console.log('positionM', positionM)
-	    const position = Number(positionM[1])
+            console.log('positionM', positionM)
+            const position = Number(positionM[1])
             const char = jsonString[position]
-	    console.log('char', char, 'char(hex)', Buffer.from(char))
-	    const bleed = 10
-	    console.log('char slice', jsonString.slice(Math.max(0, position - bleed), Math.min(jsonString.length, position + bleed)))
-	  }
-	}
+            console.log('char', char, 'char(hex)', Buffer.from(char))
+            const bleed = 10
+            console.log(
+              'char slice',
+              jsonString.slice(
+                Math.max(0, position - bleed),
+                Math.min(jsonString.length, position + bleed)
+              )
+            )
+          }
+        }
       })
       .on('error', (err) => this.emit('connection:error', err))
       .on('open', () => {
