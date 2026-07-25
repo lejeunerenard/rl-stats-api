@@ -3,15 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
-  "types": "types/rl-stats-api.d.ts",
+  "types": "dist/index.d.ts",
   "bin": "dist/bin.js",
   "exports": {
     ".": {
       "bare": {
-        "types": "./types/rl-stats-api.d.ts",
         "default": "./dist/index.js"
       },
-      "types": "./types/rl-stats-api.d.ts",
       "default": "./dist/index.js"
     }
   },
@@ -59,8 +57,7 @@
     "bare-logger": "^2.0.3",
     "bare-net": "^2.3.1",
     "effect": "^3.22.0",
-    "paparam": "^1.10.1",
-    "ready-resource": "^1.2.0"
+    "paparam": "^1.10.1"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

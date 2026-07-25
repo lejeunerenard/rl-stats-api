@@ -1,43 +1,41 @@
 // @ts-nocheck
-import { Transform } from 'streamx'
+import { Chunk, Effect, Option, Stream } from "effect"
 
-export default class ParseJSONStream extends Transform {
-  _workingString
-
-  constructor() {
-    super({
-      transform(jsonString, cb) {
-        this._workingString += jsonString.toString()
-        try {
-          const obj = JSON.parse(this._workingString)
-          this.push(obj)
-          this._workingString = ''
-        } catch {
-          let i = 0
-          while (i <= this._workingString.length) {
-            try {
-              const startChar = this._workingString[0]
-              const oppositeChar =
-                startChar === '[' ? ']' : startChar === '{' ? '}' : null
-
-              i = this._workingString.indexOf(oppositeChar, i)
-              if (i === -1) break
-              i++
-
-              const str = this._workingString.substring(0, i)
-              const obj = JSON.parse(str)
-
-              this.push(obj)
-              this._workingString = this._workingString.substring(i)
-              i = 0
-            } catch {
-              i++
-            }
-          }
-        }
-        cb(null)
-      }
-    })
-    this._workingString = ''
+function extractOneObject(working: string): Option<{ parsed: unknown; remainder: string }> {
+  if (working.length === 0) return Option.none()
+  let i = 0
+  while (i <= working.length) {
+    const startChar = working[0]
+    const oppositeChar = startChar === '[' ? ']' : startChar === '{' ? '}' : null
+    if (!oppositeChar) break
+    i = working.indexOf(oppositeChar, i)
+    if (i === -1) break
+    i++
+    const str = working.substring(0, i)
+    try {
+      const obj = JSON.parse(str)
+      return Option.some({ parsed: obj, remainder: working.substring(i) })
+    }
+    catch {
+      i++
+    }
   }
+  return Option.none()
+}
+
+export function parseJsonStream(): Stream.Stream<unknown, never, never> {
+  return Stream.unfoldEffect({ buffer: "" }, (state) =>
+    Effect.succeed(
+      Option.match(state.buffer, {
+        onNone: () => Option.none(),
+        onSome: (buf) => {
+          const result = extractOneObject(buf)
+          return Option.match(result, {
+            onNone: () => Option.none(),
+            onSome: ({ parsed, remainder }) => Option.some([Chunk.of(parsed), { buffer: remainder }])
+          })
+        }
+      })
+    )
+  )
 }

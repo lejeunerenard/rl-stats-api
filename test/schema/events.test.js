@@ -1,4 +1,4 @@
-require('../../dist/polyfill.js')
+require("bare-encoding/global") // Necessary for `effect`
 const test = require('brittle')
 const fs = require('fs')
 const path = require('path')

@@ -86,6 +86,7 @@ test('forwards UpdateState event', async (t) => {
 
   const [data] = await once(connection, 'UpdateState')
 
+  console.log('beep 7')
   t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
   t.ok(Array.isArray(data.Players), 'Players is an array')
   t.ok(data.Players.length === 1)
@@ -696,4 +697,29 @@ test('handles empty arrays', async (t) => {
   t.ok(data.Players.length === 0, 'Players array is empty')
   t.ok(data.Ball.PreHitSpeed === 0)
   t.ok(data.Ball.PostHitSpeed === 1450.2)
+})
+
+// ============================================================================
+// Schema Validation
+// ============================================================================
+
+test('rejects malformed event data', async (t) => {
+  const { server, socket, connection } = await createServerAndConnection()
+  t.teardown(async () => { await closeConnection(connection); server.close() })
+
+  socket.write(JSON.stringify({
+    Event: 'GoalScored',
+    Data: {
+      MatchGuid: 'abc',
+      GoalSpeed: 87.3,
+      GoalTime: 127.5,
+      ImpactLocation: { X: 0, Y: -2944, Z: 320 },
+      Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
+      BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 },
+      badField: true
+    }
+  }) + '\n')
+
+  const [error] = await once(connection, 'schema:error')
+  t.ok(error, 'schema:error emitted for invalid data')
 })
