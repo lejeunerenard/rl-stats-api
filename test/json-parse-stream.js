@@ -1,5 +1,5 @@
 const test = require('brittle')
-const parseJSONStream = require('../lib/json-parse-stream.js')
+const parseJSONStream = require('../dist/lib/json-parse-stream.js').default
 const { join } = require('path')
 const { createReadStream } = require('fs')
 const { Readable } = require('stream')

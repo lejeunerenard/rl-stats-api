@@ -6,11 +6,11 @@ Development priorities and planned improvements for `rl-stats-api`.
 
 ### 1. Add TypeScript Types for All Event Types
 
-**Status:** Not started
+**Status:** Complete
 
-**Current state:** The `types/` directory exists but is empty. TypeScript and `@types/streamx` are listed as devDependencies but not used. Events are emitted as raw `any` with no type safety.
+**Current state:** The `types/` directory contains `rl-stats-api.d.ts` with all 19+ event types, `bare.d.ts` for bare-net, and `ready-resource.d.ts` for ready-resource. TypeScript is configured and source files are migrated.
 
-**What needs to be done:** Create TypeScript type definitions for all 19+ event types (`UpdateState`, `GoalScored`, `BallHit`, `ClockUpdatedSeconds`, `CountdownBegin`, `CrossbarHit`, `GoalReplayEnd`, `GoalReplayStart`, `GoalReplayWillEnd`, `MatchCreated`, `MatchInitialized`, `MatchDestroyed`, `MatchEnded`, `MatchPaused`, `MatchUnpaused`, `PodiumStart`, `ReplayCreated`, `RoundStarted`, `StatfeedEvent`) matching the official API documentation at https://www.rocketleague.com/developer/stats-api. Include conditional fields and spectator-only fields.
+**Completed:** Created comprehensive type definitions for all event types (`UpdateState`, `GoalScored`, `BallHit`, `ClockUpdatedSeconds`, `CountdownBegin`, `CrossbarHit`, `GoalReplayEnd`, `GoalReplayStart`, `GoalReplayWillEnd`, `MatchCreated`, `MatchInitialized`, `MatchDestroyed`, `MatchEnded`, `MatchPaused`, `MatchUnpaused`, `PodiumStart`, `ReplayCreated`, `RoundStarted`, `StatfeedEvent`), plus shared types (`PlayerInfo`, `Position3D`, `Rotation3D`, `Velocity`, `DemoInfo`). Added `RLStatsEventMap` interface for the event map.
 
 **Why it matters:** Consumers of the library get autocomplete, compile-time validation, and better documentation. Makes the library production-ready.
 
@@ -94,17 +94,11 @@ match.on('destroy', () => { ... })
 
 ### 7. Add Build Step for TypeScript
 
-**Status:** Not started
+**Status:** Complete
 
-**Current state:** The project has typescript and @types/streamx as devDependencies but no tsconfig.json, no build scripts, and all source files are .js.
+**Current state:** TypeScript is set up with `tsconfig.json`, source files are migrated to `.ts`, build scripts are configured, output goes to `dist/`, and `package.json` has proper exports and bin entry.
 
-**What needs to be done:** Set up TypeScript compilation:
-
-- Create `tsconfig.json`
-- Migrate source files to `.ts`
-- Add build scripts (`build`, `pretest`, etc.)
-- Configure output to `dist/`
-- Update `package.json` exports and bin entry
+**Completed:** Created `tsconfig.json`, converted `index.js`, `bin.js`, and `lib/json-parse-stream.js` to TypeScript, added `build` script, configured `dist/` output, and updated `package.json` with `exports`, `main`, `bin`, and `types` fields.
 
 **Why it matters:** Enables the type safety improvements in items 1 and 3. Provides a clean separation between source and compiled output.
 

@@ -2,7 +2,19 @@
   "name": "rl-stats-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "types/rl-stats-api.d.ts",
+  "bin": "dist/bin.js",
+  "exports": {
+    ".": {
+      "bare": {
+        "types": "./types/rl-stats-api.d.ts",
+        "default": "./dist/index.js"
+      },
+      "types": "./types/rl-stats-api.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "imports": {
     "events": {
       "bare": "bare-events"
@@ -24,9 +36,10 @@
     }
   },
   "scripts": {
-    "start": "bare ./bin.js",
+    "build": "tsc",
+    "start": "bare ./dist/bin.js",
     "format": "prettier . --write",
-    "test": "brittle-bare test/all.js",
+    "test": "npm run build && brittle-bare test/all.js",
     "lint": "prettier . --check && lunte"
   },
   "repository": {
@@ -49,12 +62,14 @@
     "ready-resource": "^1.2.0"
   },
   "devDependencies": {
+    "@types/node": "^26.1.1",
     "bare-fs": "^4.7.1",
     "bare-path": "^3.0.0",
     "bare-stream": "^2.13.1",
     "brittle": "^3.19.0",
     "lunte": "^1.2.0",
     "prettier": "^3.6.2",
-    "prettier-config-holepunch": "^2.0.0"
+    "prettier-config-holepunch": "^2.0.0",
+    "typescript": "^7.0.2"
   }
 }
