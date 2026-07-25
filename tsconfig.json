@@ -4,7 +4,7 @@
     "module": "CommonJS",
     "lib": ["ES2020", "DOM"],
     "outDir": "dist",
-    "rootDir": ".",
+    "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "bundler",
@@ -16,10 +16,8 @@
     "noImplicitAny": false
   },
   "include": [
-    "lib/**/*.ts",
-    "types/**/*.ts",
-    "bin.ts",
-    "index.ts"
+    "src/**/*.ts",
+    "types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
