@@ -47,7 +47,19 @@ Why it matters: Prevents typos in event names at compile time. Gives consumers c
 
 **Current state:** 28 integration tests covering connection events, all 19 event types, chunked data handling, match lifecycle ordering, and data integrity. Tests use mock servers in the Bare runtime.
 
-**Completed:** Created `test/rl-stats-api.js` with tests for: connection events (connected, connection:error), event forwarding for all 19 event types (individual tests per type), chunked data handling (split across multiple writes, multiple events in single write), match lifecycle ordering (15-event sequence), and data integrity (nested structures, empty arrays). Added `test/fixtures/match-lifecycle.txt` fixture file.
+**Completed:** Created `test/rl-stats-api.js` with tests for: connection events (connected, connection:error), event forwarding for all 19 event types (individual tests per type), chunked data handling (split writes, multiple events per write), match lifecycle ordering (15-event sequence), and data integrity (nested structures, empty arrays). Added `test/fixtures/match-lifecycle.txt` fixture file.
+
+**Audit fixes applied (matching official docs at https://www.rocketleague.com/developer/stats-api):**
+- `MatchCreatedData`: Removed non-`MatchGuid` fields (`MatchType`, `GameMode`, `MapName`, `TeamSize`, `bIsRanked`, `bIsTournament`, `bIsMatchmaking`, `Teams`)
+- `MatchEndedData`: Removed non-`MatchGuid`/`WinnerTeamNum` field (`ScoreByTeam`)
+- `GoalReplayStartData`: Removed non-`MatchGuid` fields (`Scorer`, `Assister`, `GoalSpeed`, `GoalTime`, `ImpactLocation`)
+- `ReplayCreatedData`: Removed non-`MatchGuid` fields (`ReplayIndex`, `ReplayName`)
+- `CrossbarHitData`: Fixed field names (`ImpactLocation`→`BallLocation`, added `ImpactForce`, added `BallLastTouch`)
+- `GoalScoredData`: Added missing `BallLastTouch` field
+- `ClockUpdatedSecondsData`: Added missing `MatchGuid`
+- `BallHitData`: Added missing `MatchGuid`
+- `StatfeedEventData`: Added missing `MatchGuid`
+- Updated all corresponding tests and fixture to match
 
 **Why it matters:** Integration tests catch regressions in the connection and event forwarding logic that unit tests alone won't cover.
 

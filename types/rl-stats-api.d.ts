@@ -156,11 +156,15 @@ export interface GoalScoredData {
   Event: 'GoalScored'
   Data: {
     MatchGuid?: string
-    Scorer: PlayerInfo
-    Assister?: PlayerInfo
     GoalSpeed: number
     GoalTime: number
     ImpactLocation: Position3D
+    Scorer: PlayerInfo
+    Assister?: PlayerInfo
+    BallLastTouch: {
+      Player: PlayerInfo
+      Speed: number
+    }
   }
 }
 
@@ -171,6 +175,7 @@ export interface GoalScoredData {
 export interface BallHitData {
   Event: 'BallHit'
   Data: {
+    MatchGuid?: string
     Players: PlayerInfo[]
     Ball: {
       PreHitSpeed: number
@@ -187,6 +192,7 @@ export interface BallHitData {
 export interface ClockUpdatedSecondsData {
   Event: 'ClockUpdatedSeconds'
   Data: {
+    MatchGuid?: string
     TimeSeconds: number
     bOvertime: boolean
   }
@@ -221,20 +227,7 @@ export interface RoundStartedData {
 export interface MatchCreatedData {
   Event: 'MatchCreated'
   Data: {
-    MatchGuid: string
-    MatchType: string
-    GameMode: string
-    MapName: string
-    TeamSize: number
-    bIsRanked: boolean
-    bIsTournament: boolean
-    bIsMatchmaking: boolean
-    Teams: {
-      TeamNum: number
-      Name: string
-      ColorPrimary: string
-      ColorSecondary: string
-    }[]
+    MatchGuid?: string
   }
 }
 
@@ -258,10 +251,6 @@ export interface MatchEndedData {
   Data: {
     MatchGuid?: string
     WinnerTeamNum: number
-    ScoreByTeam: {
-      TeamNum: number
-      Score: number
-    }[]
   }
 }
 
@@ -301,6 +290,7 @@ export interface MatchUnpausedData {
 export interface StatfeedEventData {
   Event: 'StatfeedEvent'
   Data: {
+    MatchGuid?: string
     EventName: string
     Type: string
     MainTarget: PlayerInfo
@@ -316,9 +306,13 @@ export interface CrossbarHitData {
   Event: 'CrossbarHit'
   Data: {
     MatchGuid?: string
-    Player: PlayerInfo
+    BallLocation: Position3D
     BallSpeed: number
-    ImpactLocation: Position3D
+    ImpactForce: number
+    BallLastTouch: {
+      Player: PlayerInfo
+      Speed: number
+    }
   }
 }
 
@@ -330,11 +324,6 @@ export interface GoalReplayStartData {
   Event: 'GoalReplayStart'
   Data: {
     MatchGuid?: string
-    Scorer: PlayerInfo
-    Assister?: PlayerInfo
-    GoalSpeed: number
-    GoalTime: number
-    ImpactLocation: Position3D
   }
 }
 
@@ -370,9 +359,7 @@ export interface PodiumStartData {
 export interface ReplayCreatedData {
   Event: 'ReplayCreated'
   Data: {
-    MatchGuid: string
-    ReplayIndex: number
-    ReplayName: string
+    MatchGuid?: string
   }
 }
 

@@ -1,4 +1,4 @@
-{"Event":"MatchCreated","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6","MatchType":"Online","GameMode":"Ranked","MapName":"Stadium_P","TeamSize":3,"bIsRanked":true,"bIsTournament":false,"bIsMatchmaking":true,"Teams":[{"TeamNum":0,"Name":"Blue","ColorPrimary":"0000FF","ColorSecondary":"0000AA"},{"TeamNum":1,"Name":"Orange","ColorPrimary":"FF6600","ColorSecondary":"CC5500"}]}}
+{"Event":"MatchCreated","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
 {"Event":"MatchInitialized","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
 {"Event":"CountdownBegin","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
 {"Event":"RoundStarted","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
@@ -10,6 +10,6 @@
 {"Event":"GoalReplayStart","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
 {"Event":"GoalReplayWillEnd","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
 {"Event":"GoalReplayEnd","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
-{"Event":"MatchEnded","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6","WinnerTeamNum":0,"ScoreByTeam":[{"TeamNum":0,"Score":2},{"TeamNum":1,"Score":1}]}}
+{"Event":"MatchEnded","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6","WinnerTeamNum":0}}
 {"Event":"PodiumStart","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
 {"Event":"MatchDestroyed","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
