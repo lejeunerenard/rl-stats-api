@@ -58,6 +58,7 @@
     "bare-events": "^2.8.2",
     "bare-logger": "^2.0.3",
     "bare-net": "^2.3.1",
+    "effect": "^3.22.0",
     "paparam": "^1.10.1",
     "ready-resource": "^1.2.0"
   },

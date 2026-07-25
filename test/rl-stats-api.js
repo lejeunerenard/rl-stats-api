@@ -502,7 +502,8 @@ test('handles events split across multiple writes', async (t) => {
       GoalTime: 127.5,
       ImpactLocation: { X: 0, Y: -2944, Z: 320 },
       Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
-      Assister: { Name: 'PlayerC', Shortcut: 3, TeamNum: 0 }
+      Assister: { Name: 'PlayerC', Shortcut: 3, TeamNum: 0 },
+      BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 }
     }
   })
 
@@ -541,7 +542,8 @@ test('handles multiple events in a single write', async (t) => {
       GoalTime: 127.5,
       ImpactLocation: { X: 0, Y: -2944, Z: 320 },
       Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
-      Assister: { Name: 'PlayerC', Shortcut: 3, TeamNum: 0 }
+      Assister: { Name: 'PlayerC', Shortcut: 3, TeamNum: 0 },
+      BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 }
     }
   })
 
