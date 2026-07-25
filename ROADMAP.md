@@ -14,19 +14,9 @@ Development priorities and planned improvements for `rl-stats-api`.
 
 **Why it matters:** Consumers of the library get autocomplete, compile-time validation, and better documentation. Makes the library production-ready.
 
-### 2. Fix `package.json` / `package-lock.json` Mismatch
-
-**Status:** Not started
-
-**Current state:** The `package-lock.json` references `bin/rl-stats-api-cli: dist/bin.js` (implying a build step to `dist/`) while `package.json` scripts reference `bare ./bin.js` directly. The lock file also lists `@types/streamx` and `typescript` as devDependencies that are absent from `package.json`.
-
-**What needs to be done:** Reconcile the two files. Either remove the `dist/` reference if there's no build step planned, or add the build infrastructure if TypeScript compilation is intended.
-
-**Why it matters:** Inconsistent lock files cause installation issues and confusion about the intended build process.
-
 ## Medium Impact
 
-### 3. Add Type-Safe Event Emitter
+### 2. Add Type-Safe Event Emitter
 
 **Status:** Not started
 
@@ -42,7 +32,7 @@ connection.on('GoalScored', (data) => {
 
 Why it matters: Prevents typos in event names at compile time. Gives consumers confidence about what data each event provides.
 
-### 4. Improve the CLI
+### 3. Improve the CLI
 
 **Status:** Not started
 
@@ -51,7 +41,7 @@ Why it matters: Prevents typos in event names at compile time. Gives consumers c
 
 **Why it matters:** A functional CLI serves as both a working example and a debugging tool. Users can quickly inspect raw events from Rocket League without writing code.
 
-### 5. Add Integration Tests
+### 4. Add Integration Tests
 
 **Status:** Not started
 
@@ -68,7 +58,7 @@ Why it matters: Prevents typos in event names at compile time. Gives consumers c
 
 ## Lower Priority / Larger Effort
 
-### 6. Add Reconnection Logic
+### 5. Add Reconnection Logic
 
 **Status:** Not started
 
@@ -83,7 +73,7 @@ Why it matters: Prevents typos in event names at compile time. Gives consumers c
 
 **Why it matters:** Makes the library robust enough for long-running applications like broadcast HUDs or match analytics dashboards.
 
-### 7. Add Match Lifecycle Abstractions
+### 6. Add Match Lifecycle Abstractions
 
 **Status:** Not started
 
@@ -102,7 +92,7 @@ match.on('destroy', () => { ... })
 
 **Why it matters:** Most consumers care about the match lifecycle, not individual raw events. This reduces boilerplate and makes the library more expressive.
 
-### 8. Add Build Step for TypeScript
+### 7. Add Build Step for TypeScript
 
 **Status:** Not started
 
