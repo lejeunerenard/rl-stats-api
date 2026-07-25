@@ -3,8 +3,8 @@ import "bare-encoding/global"
 
 import EventEmitter from "events"
 import net from "net"
-import { decodeEventStrict } from "./schema/decode.js"
-import { Effect, Exit, Option } from "effect"
+import { decodeAndParse } from "./lib/json-parse-stream.js"
+import { ConfigLive, defaultConfig } from "./layers/config.js"
 import {
   PlayerInfo,
   Position3D,
@@ -30,66 +30,8 @@ import {
   AllEvents
 } from "./schema/events.js"
 
-export function extractOneObject(working: string): Option<{ parsed: unknown; remainder: string }> {
-  if (working.length === 0) return Option.none()
-
-  let start = 0
-  while (start < working.length && /\s/.test(working[start])) {
-    start++
-  }
-  if (start === working.length) return Option.none()
-
-  const startChar = working[start]
-  const endChar = startChar === '[' ? ']' : startChar === '{' ? '}' : null
-  if (!endChar) return Option.none()
-
-  let depth = 0
-  let inString = false
-  let escape = false
-
-  for (let i = start; i < working.length; i++) {
-    const char = working[i]
-
-    if (escape) {
-      escape = false
-      continue
-    }
-
-    if (char === '\\' && inString) {
-      escape = true
-      continue
-    }
-
-    if (char === '"') {
-      inString = !inString
-      continue
-    }
-
-    if (inString) continue
-
-    if (char === '{' || char === '[') {
-      depth++
-    } else if (char === '}' || char === ']') {
-      depth--
-      if (depth === 0) {
-        const str = working.substring(0, i + 1)
-        try {
-          const obj = JSON.parse(str)
-          return Option.some({ parsed: obj, remainder: working.substring(i + 1) })
-        }
-        catch {
-          return Option.none()
-        }
-      }
-    }
-  }
-
-  return Option.none()
-}
-
 export {
   AllEvents,
-  decodeEventStrict,
   PlayerInfo,
   Position3D,
   UpdateStateData,
@@ -110,7 +52,9 @@ export {
   GoalReplayEndData,
   GoalReplayWillEndData,
   PodiumStartData,
-  ReplayCreatedData
+  ReplayCreatedData,
+  ConfigLive,
+  defaultConfig
 }
 
 export type AllEventsType = typeof AllEvents.Type
@@ -123,7 +67,7 @@ export class RLStatsAPI extends EventEmitter {
   _buffer
   connecting
 
-  constructor(port = 49123, host = "127.0.0.1") {
+  constructor(port = defaultConfig.port, host = defaultConfig.host) {
     super()
     this.port = port
     this.host = host
@@ -166,22 +110,17 @@ export class RLStatsAPI extends EventEmitter {
 
   private handleData(str) {
     this._buffer += str
-    let result
-    do {
-      result = extractOneObject(this._buffer)
-      if (Option.isSome(result)) {
-        const { parsed, remainder } = result.value
-        this._buffer = remainder
-        const exit = Effect.runSyncExit(decodeEventStrict(parsed))
-        if (Exit.isSuccess(exit)) {
-          const event = exit.value
-          this.emit(event.Event, event.Data)
-        }
-        else {
-          this.emit("schema:error", exit.cause)
-        }
+    const { results, remainder } = decodeAndParse(this._buffer)
+    this._buffer = remainder
+
+    for (const result of results) {
+      if (result.type === 'event') {
+        this.emit(result.event, result.data)
       }
-    } while (Option.isSome(result))
+      else {
+        this.emit("schema:error", result.error)
+      }
+    }
   }
 }
 

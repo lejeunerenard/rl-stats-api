@@ -16,7 +16,7 @@ export const ConnectionLive = Layer.effect(
       const { port, host } = yield* RLStatsConfig
       const socket = yield* Effect.sync(() => net.createConnection(port, host))
       const connected = new Promise<void>((resolve, reject) => {
-        socket.once("open", () => resolve())
+        socket.once("connect", () => resolve())
         socket.once("error", (err) => reject(err))
       })
       return { socket, connected: Effect.promise(() => connected) }

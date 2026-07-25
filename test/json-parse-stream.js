@@ -1,64 +1,10 @@
 const test = require('brittle')
 require("bare-encoding/global")
 
+const { Option } = require('effect')
 const { join } = require('path')
 const { createReadStream } = require('fs')
-
-function extractOneObject(working) {
-  if (working.length === 0) return null
-
-  let start = 0
-  while (start < working.length && /\s/.test(working[start])) {
-    start++
-  }
-  if (start === working.length) return null
-
-  const startChar = working[start]
-  const endChar = startChar === '[' ? ']' : startChar === '{' ? '}' : null
-  if (!endChar) return null
-
-  let depth = 0
-  let inString = false
-  let escape = false
-
-  for (let i = start; i < working.length; i++) {
-    const char = working[i]
-
-    if (escape) {
-      escape = false
-      continue
-    }
-
-    if (char === '\\' && inString) {
-      escape = true
-      continue
-    }
-
-    if (char === '"') {
-      inString = !inString
-      continue
-    }
-
-    if (inString) continue
-
-    if (char === '{' || char === '[') {
-      depth++
-    } else if (char === '}' || char === ']') {
-      depth--
-      if (depth === 0) {
-        const str = working.substring(0, i + 1)
-        try {
-          const obj = JSON.parse(str)
-          return { parsed: obj, remainder: working.substring(i + 1) }
-        } catch {
-          return null
-        }
-      }
-    }
-  }
-
-  return null
-}
+const { extractOneObject } = require('../dist/lib/json-parse-stream.js')
 
 function parseAll(input) {
   const results = []
@@ -66,11 +12,11 @@ function parseAll(input) {
   let result
   do {
     result = extractOneObject(buffer)
-    if (result) {
-      results.push(result.parsed)
-      buffer = result.remainder
+    if (Option.isSome(result)) {
+      results.push(result.value.parsed)
+      buffer = result.value.remainder
     }
-  } while (result)
+  } while (Option.isSome(result))
   return results
 }
 

@@ -13,7 +13,10 @@
       "default": "./dist/index.js"
     }
   },
-  "imports": {
+ "imports": {
+    "bare-encoding": {
+      "bare": "bare-encoding"
+    },
     "events": {
       "bare": "bare-events"
     },
@@ -53,6 +56,7 @@
   "homepage": "https://github.com/lejeunerenard/rl-stats-api",
   "type": "commonjs",
   "dependencies": {
+    "bare-encoding": "^1.0.3",
     "bare-events": "^2.8.2",
     "bare-logger": "^2.0.3",
     "bare-net": "^2.3.1",
