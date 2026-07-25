@@ -1,0 +1,15 @@
+{"Event":"MatchCreated","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6","MatchType":"Online","GameMode":"Ranked","MapName":"Stadium_P","TeamSize":3,"bIsRanked":true,"bIsTournament":false,"bIsMatchmaking":true,"Teams":[{"TeamNum":0,"Name":"Blue","ColorPrimary":"0000FF","ColorSecondary":"0000AA"},{"TeamNum":1,"Name":"Orange","ColorPrimary":"FF6600","ColorSecondary":"CC5500"}]}}
+{"Event":"MatchInitialized","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"CountdownBegin","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"RoundStarted","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"GoalScored","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6","GoalSpeed":87.3,"GoalTime":127.5,"ImpactLocation":{"X":0,"Y":-2944,"Z":320},"Scorer":{"Name":"PlayerA","Shortcut":1,"TeamNum":0},"Assister":{"Name":"PlayerC","Shortcut":3,"TeamNum":0},"BallLastTouch":{"Player":{"Name":"PlayerA","Shortcut":1,"TeamNum":0},"Speed":125}}}
+{"Event":"GoalReplayStart","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"GoalReplayWillEnd","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"GoalReplayEnd","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"GoalScored","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6","GoalSpeed":92.1,"GoalTime":245.3,"ImpactLocation":{"X":0,"Y":2944,"Z":320},"Scorer":{"Name":"PlayerD","Shortcut":4,"TeamNum":1},"BallLastTouch":{"Player":{"Name":"PlayerD","Shortcut":4,"TeamNum":1},"Speed":130}}}
+{"Event":"GoalReplayStart","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"GoalReplayWillEnd","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"GoalReplayEnd","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"MatchEnded","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6","WinnerTeamNum":0,"ScoreByTeam":[{"TeamNum":0,"Score":2},{"TeamNum":1,"Score":1}]}}
+{"Event":"PodiumStart","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}
+{"Event":"MatchDestroyed","Data":{"MatchGuid":"A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"}}

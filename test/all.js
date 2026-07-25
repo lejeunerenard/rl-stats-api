@@ -8,6 +8,7 @@ async function runTests () {
   test.pause()
 
   await import('./json-parse-stream.js')
+  await import('./rl-stats-api.js')
 
   test.resume()
 }

@@ -43,16 +43,11 @@ Why it matters: Prevents typos in event names at compile time. Gives consumers c
 
 ### 4. Add Integration Tests
 
-**Status:** Not started
+**Status:** Complete
 
-**Current state:** Tests exist only for ParseJSONStream (the chunked JSON parser). There are no tests for the connection, event forwarding, or the end-to-end flow.
+**Current state:** 28 integration tests covering connection events, all 19 event types, chunked data handling, match lifecycle ordering, and data integrity. Tests use mock servers in the Bare runtime.
 
-**What needs to be done:** Add tests that verify RLStatsAPI correctly:
-
-- Emits a connected event when the socket opens
-- Forwards parsed { Event, Data } objects as typed events
-- Handles connection errors appropriately
-- Processes chunked data correctly end-to-end
+**Completed:** Created `test/rl-stats-api.js` with tests for: connection events (connected, connection:error), event forwarding for all 19 event types (individual tests per type), chunked data handling (split across multiple writes, multiple events in single write), match lifecycle ordering (15-event sequence), and data integrity (nested structures, empty arrays). Added `test/fixtures/match-lifecycle.txt` fixture file.
 
 **Why it matters:** Integration tests catch regressions in the connection and event forwarding logic that unit tests alone won't cover.
 
