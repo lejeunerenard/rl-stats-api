@@ -5,58 +5,10 @@ import EventEmitter from "events"
 import net from "net"
 import { decodeAndParse } from "./lib/json-parse-stream.js"
 import { ConfigLive, defaultConfig } from "./layers/config.js"
-import {
-  PlayerInfo,
-  Position3D,
-  UpdateStateData,
-  GoalScoredData,
-  BallHitData,
-  ClockUpdatedSecondsData,
-  CountdownBeginData,
-  RoundStartedData,
-  MatchCreatedData,
-  MatchInitializedData,
-  MatchEndedData,
-  MatchDestroyedData,
-  MatchPausedData,
-  MatchUnpausedData,
-  StatfeedEventData,
-  CrossbarHitData,
-  GoalReplayStartData,
-  GoalReplayEndData,
-  GoalReplayWillEndData,
-  PodiumStartData,
-  ReplayCreatedData,
-  AllEvents
-} from "./schema/events.js"
 
-export {
-  AllEvents,
-  PlayerInfo,
-  Position3D,
-  UpdateStateData,
-  GoalScoredData,
-  BallHitData,
-  ClockUpdatedSecondsData,
-  CountdownBeginData,
-  RoundStartedData,
-  MatchCreatedData,
-  MatchInitializedData,
-  MatchEndedData,
-  MatchDestroyedData,
-  MatchPausedData,
-  MatchUnpausedData,
-  StatfeedEventData,
-  CrossbarHitData,
-  GoalReplayStartData,
-  GoalReplayEndData,
-  GoalReplayWillEndData,
-  PodiumStartData,
-  ReplayCreatedData,
-  ConfigLive,
-  defaultConfig
-}
-
+// Schema
+export * from "./schema/events.js"
+import { AllEvents } from "./schema/events.js"
 export type AllEventsType = typeof AllEvents.Type
 
 export class RLStatsAPI extends EventEmitter {
