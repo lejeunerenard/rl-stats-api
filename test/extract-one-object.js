@@ -1,4 +1,6 @@
 const test = require('brittle')
+const fs = require('fs')
+const path = require('path')
 const { Option } = require('effect')
 const { extractOneObject } = require('../dist/lib/json-parse-stream.js')
 
@@ -223,5 +225,15 @@ test('extractOneObject - handles strings with backslash-brace sequences', (t) =>
   const result = extractOneObject(input)
   t.ok(Option.isSome(result))
   t.is(result.value.parsed.path, 'C:\\Users\\{name}')
+  t.is(result.value.remainder, '')
+})
+
+test('extractOneObject - real game data with unicode', (t) => {
+  const fixturePath = path.join(__dirname, 'fixtures/real-game-updatestate.json')
+  const raw = fs.readFileSync(fixturePath, 'utf8').trim()
+  const result = extractOneObject(raw)
+  t.ok(Option.isSome(result))
+  t.is(result.value.parsed.Event, 'UpdateState')
+  t.ok(result.value.parsed.Data.includes('Quixōtic'))
   t.is(result.value.remainder, '')
 })
