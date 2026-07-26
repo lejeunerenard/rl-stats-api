@@ -37,15 +37,15 @@ export const UpdateStatePlayer = Schema.Struct({
   CarTouches: Schema.Number,
   Demos: Schema.Number,
   bHasCar: Schema.Boolean,
-  Speed: Schema.Number,
-  Boost: Schema.Number,
-  bBoosting: Schema.Boolean,
-  bOnGround: Schema.Boolean,
-  bOnWall: Schema.Boolean,
-  bPowersliding: Schema.Boolean,
-  bDemolished: Schema.Boolean,
+  Speed: Schema.optionalWith(Schema.Number, { exact: true }),
+  Boost: Schema.optionalWith(Schema.Number, { exact: true }),
+  bBoosting: Schema.optionalWith(Schema.Boolean, { exact: true }),
+  bOnGround: Schema.optionalWith(Schema.Boolean, { exact: true }),
+  bOnWall: Schema.optionalWith(Schema.Boolean, { exact: true }),
+  bPowersliding: Schema.optionalWith(Schema.Boolean, { exact: true }),
+  bDemolished: Schema.optionalWith(Schema.Boolean, { exact: true }),
   Attacker: Schema.optionalWith(PlayerInfo, { exact: true }),
-  bSupersonic: Schema.Boolean
+  bSupersonic: Schema.optionalWith(Schema.Boolean, { exact: true })
 })
 
 export const UpdateStateTeam = Schema.Struct({
@@ -142,6 +142,8 @@ export const GoalReplayEndData = MatchGuidEvent
 export const GoalReplayWillEndData = MatchGuidEvent
 export const PodiumStartData = MatchGuidEvent
 export const ReplayCreatedData = MatchGuidEvent
+export const ReplayPlaybackStartData = MatchGuidEvent
+export const ReplayPlaybackEndData = MatchGuidEvent
 
 // ============================================================================
 // MatchInitialized (MatchGuid is REQUIRED)
@@ -210,6 +212,8 @@ export const GoalReplayEndSchema = Schema.Struct({ Event: Schema.Literal("GoalRe
 export const GoalReplayWillEndSchema = Schema.Struct({ Event: Schema.Literal("GoalReplayWillEnd"), Data: GoalReplayWillEndData })
 export const PodiumStartSchema = Schema.Struct({ Event: Schema.Literal("PodiumStart"), Data: PodiumStartData })
 export const ReplayCreatedSchema = Schema.Struct({ Event: Schema.Literal("ReplayCreated"), Data: ReplayCreatedData })
+export const ReplayPlaybackStartSchema = Schema.Struct({ Event: Schema.Literal("ReplayPlaybackStart"), Data: ReplayPlaybackStartData })
+export const ReplayPlaybackEndSchema = Schema.Struct({ Event: Schema.Literal("ReplayPlaybackEnd"), Data: ReplayPlaybackEndData })
 
 // ============================================================================
 // Discriminated Union
@@ -234,5 +238,7 @@ export const AllEvents = Schema.Union(
   GoalReplayEndSchema,
   GoalReplayWillEndSchema,
   PodiumStartSchema,
-  ReplayCreatedSchema
+  ReplayCreatedSchema,
+  ReplayPlaybackStartSchema,
+  ReplayPlaybackEndSchema
 )

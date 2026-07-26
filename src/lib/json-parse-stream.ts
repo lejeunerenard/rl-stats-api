@@ -72,6 +72,19 @@ export interface SchemaError {
 
 export type ParseResult = ParsedEvent | SchemaError
 
+function normalizeEventData(raw: unknown): unknown {
+  if (typeof raw !== 'object' || raw === null) return raw
+  const obj = raw as Record<string, unknown>
+  if (typeof obj.Data === 'string') {
+    try {
+      obj.Data = JSON.parse(obj.Data)
+    } catch {
+      // If Data string isn't valid JSON, leave it as-is — schema will reject it
+    }
+  }
+  return obj
+}
+
 export function decodeAndParse(str: string): { results: ParseResult[]; remainder: string } {
   const results: ParseResult[] = []
   let buffer = str
@@ -83,7 +96,8 @@ export function decodeAndParse(str: string): { results: ParseResult[]; remainder
     const { parsed, remainder } = result.value
     buffer = remainder
 
-    const exit = Effect.runSyncExit(decodeEventStrict(parsed))
+    const normalized = normalizeEventData(parsed)
+    const exit = Effect.runSyncExit(decodeEventStrict(normalized))
     if (Exit.isSuccess(exit)) {
       const event = exit.value
       results.push({ type: 'event', event: event.Event, data: event.Data })

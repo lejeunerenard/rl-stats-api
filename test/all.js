@@ -10,6 +10,7 @@ async function runTests () {
   await import('./json-parse-stream.js')
   await import('./schema/events.test.js')
   await import('./rl-stats-api.js')
+  await import('./extract-one-object.js')
 
   test.resume()
 }

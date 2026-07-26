@@ -483,6 +483,40 @@ test('forwards ReplayCreated event', async (t) => {
   t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
 })
 
+test('forwards ReplayPlaybackStart event', async (t) => {
+  const { server, socket, connection } = await createServerAndConnection()
+
+  t.teardown(async () => {
+    await closeConnection(connection)
+    server.close()
+  })
+
+  sendEvent(socket, 'ReplayPlaybackStart', {
+    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'
+  })
+
+  const [data] = await once(connection, 'ReplayPlaybackStart')
+
+  t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
+})
+
+test('forwards ReplayPlaybackEnd event', async (t) => {
+  const { server, socket, connection } = await createServerAndConnection()
+
+  t.teardown(async () => {
+    await closeConnection(connection)
+    server.close()
+  })
+
+  sendEvent(socket, 'ReplayPlaybackEnd', {
+    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'
+  })
+
+  const [data] = await once(connection, 'ReplayPlaybackEnd')
+
+  t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
+})
+
 // ============================================================================
 // Chunked Data Handling
 // ============================================================================
@@ -611,6 +645,33 @@ test('emits events in correct match lifecycle order', async (t) => {
 
   t.alike(received, expectedEvents.slice(0, lines.length), 'events received in correct order')
   t.ok(matchGuids.every(g => g === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'), 'all events share same MatchGuid')
+})
+
+// Fixture was too big
+test.skip('example output processing', async (t) => {
+  const { server, socket, connection } = await createServerAndConnection()
+
+  t.teardown(async () => {
+    await closeConnection(connection)
+    server.close()
+  })
+
+  const fixturePath = join(__dirname, './fixtures/out1780278903814.json')
+  const stream = createReadStream(fixturePath, { highWaterMark: 4096 })
+
+  // Collect events as they arrive
+  const received = []
+  const matchGuids = []
+
+  // Send events line by line from the fixture file
+  connection.on('schema:error', (err) => {
+    console.error(err.error.message)
+    throw err
+  })
+
+  for await (const chunk of stream) {
+    socket.write(chunk.toString())
+  }
 })
 
 // ============================================================================
