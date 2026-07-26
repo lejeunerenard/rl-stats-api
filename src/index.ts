@@ -70,7 +70,7 @@ export class RLStatsAPI extends EventEmitter {
         this.emit(result.event, result.data)
       }
       else {
-        this.emit("schema:error", result.error)
+        this.emit("schema:error", { error: result.error, raw: result.raw })
       }
     }
   }

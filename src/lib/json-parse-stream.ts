@@ -2,7 +2,7 @@
 import { Effect, Exit, Option } from "effect"
 import { decodeEventStrict } from "../schema/decode.js"
 
-export function extractOneObject(working: string): Option<{ parsed: unknown; remainder: string }> {
+export function extractOneObject(working: string): Option<{ parsed: unknown; raw: string; remainder: string }> {
   if (working.length === 0) return Option.none()
 
   let start = 0
@@ -47,7 +47,7 @@ export function extractOneObject(working: string): Option<{ parsed: unknown; rem
         const str = working.substring(0, i + 1)
         try {
           const obj = JSON.parse(str)
-          return Option.some({ parsed: obj, remainder: working.substring(i + 1) })
+          return Option.some({ parsed: obj, raw: str, remainder: working.substring(i + 1) })
         }
         catch {
           return Option.none()
@@ -68,6 +68,7 @@ export interface ParsedEvent {
 export interface SchemaError {
   type: 'error'
   error: unknown
+  raw: string
 }
 
 export type ParseResult = ParsedEvent | SchemaError
@@ -93,7 +94,7 @@ export function decodeAndParse(str: string): { results: ParseResult[]; remainder
     const result = extractOneObject(buffer)
     if (!Option.isSome(result)) break
 
-    const { parsed, remainder } = result.value
+    const { parsed, raw, remainder } = result.value
     buffer = remainder
 
     const normalized = normalizeEventData(parsed)
@@ -103,7 +104,7 @@ export function decodeAndParse(str: string): { results: ParseResult[]; remainder
       results.push({ type: 'event', event: event.Event, data: event.Data })
     }
     else {
-      results.push({ type: 'error', error: exit.cause })
+      results.push({ type: 'error', error: exit.cause, raw })
     }
   }
 

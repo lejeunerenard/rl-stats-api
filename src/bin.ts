@@ -24,8 +24,9 @@ const cmd = command(
     connection.on('BallHit', (data) => {
       console.log('BallHit', JSON.stringify(data, null, 2))
     })
-    connection.on('schema:error', (err) => {
-      console.error('schema error', err)
+    connection.on('schema:error', ({ error, raw }) => {
+      console.error('schema error:', error)
+      console.error('raw:', raw)
     })
   }
 )
