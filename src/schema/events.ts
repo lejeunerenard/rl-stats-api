@@ -36,7 +36,7 @@ export const UpdateStatePlayer = Schema.Struct({
   Touches: Schema.Number,
   CarTouches: Schema.Number,
   Demos: Schema.Number,
-  bHasCar: Schema.Boolean,
+  bHasCar: Schema.optionalWith(Schema.Boolean, { exact: true }),
   Speed: Schema.optionalWith(Schema.Number, { exact: true }),
   Boost: Schema.optionalWith(Schema.Number, { exact: true }),
   bBoosting: Schema.optionalWith(Schema.Boolean, { exact: true }),
