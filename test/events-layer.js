@@ -5,6 +5,7 @@ const { Effect, Stream, Layer } = require('effect')
 const { RLStatsService, RLStatsServiceLive } = require('../dist/layers/events.js')
 const { ConnectionServiceLive } = require('../dist/layers/connection.js')
 const { RLStatsConfig } = require('../dist/layers/config.js')
+const { setupTest } = require('./helpers/mock-server.js')
 
 function getRLStatsService(port) {
   return Effect.runPromise(
@@ -17,11 +18,7 @@ function getRLStatsService(port) {
 }
 
 test('RLStatsServiceLive emits parsed events', async (t) => {
-  const server = net.createServer()
-  server.listen(0, '127.0.0.1')
-  t.teardown(() => server.close())
-  await once(server, 'listening')
-  const port = server.address().port
+  const { server, port } = await setupTest(t)
 
   const collected = []
   const errors = []
@@ -30,7 +27,7 @@ test('RLStatsServiceLive emits parsed events', async (t) => {
 
   const service = await getRLStatsService(port)
 
-  const fiber = Effect.runFork(
+  Effect.runFork(
     Stream.runForEach(service.parsed, (parsed) => {
       if (parsed.type === 'event') {
         collected.push(parsed)
@@ -41,9 +38,8 @@ test('RLStatsServiceLive emits parsed events', async (t) => {
     })
   )
 
-  await new Promise(resolve => setTimeout(resolve, 100))
-
   const [serverSocket] = await connectionPromise
+  t.teardown(() => serverSocket.destroy())
 
   serverSocket.write(JSON.stringify({
     Event: 'GoalScored',
@@ -57,8 +53,14 @@ test('RLStatsServiceLive emits parsed events', async (t) => {
     }
   }) + '\n')
 
-  // TODO refactor these timeouts out
-  await new Promise(resolve => setTimeout(resolve, 500))
+  // Wait for the event to be collected
+  await new Promise(resolve => {
+    const check = () => {
+      if (collected.length > 0) resolve()
+      else setTimeout(check, 10)
+    }
+    check()
+  })
 
   t.is(collected.length, 1)
   t.is(collected[0].event, 'GoalScored')
@@ -67,11 +69,7 @@ test('RLStatsServiceLive emits parsed events', async (t) => {
 })
 
 test('RLStatsServiceLive handles chunked data', async (t) => {
-  const server = net.createServer()
-  server.listen(0, '127.0.0.1')
-  t.teardown(() => server.close())
-  await once(server, 'listening')
-  const port = server.address().port
+  const { server, port } = await setupTest(t)
 
   const collected = []
 
@@ -79,7 +77,7 @@ test('RLStatsServiceLive handles chunked data', async (t) => {
 
   const service = await getRLStatsService(port)
 
-  const fiber = Effect.runFork(
+  Effect.runFork(
     Stream.runForEach(service.parsed, (parsed) => {
       if (parsed.type === 'event') {
         collected.push(parsed)
@@ -88,9 +86,8 @@ test('RLStatsServiceLive handles chunked data', async (t) => {
     })
   )
 
-  await new Promise(resolve => setTimeout(resolve, 100))
-
   const [serverSocket] = await connectionPromise
+  t.teardown(() => serverSocket.destroy())
 
   const json = JSON.stringify({
     Event: 'BallHit',
@@ -109,7 +106,14 @@ test('RLStatsServiceLive handles chunked data', async (t) => {
     serverSocket.write(chunk)
   }
 
-  await new Promise(resolve => setTimeout(resolve, 500))
+  // Wait for the event to be collected
+  await new Promise(resolve => {
+    const check = () => {
+      if (collected.length > 0) resolve()
+      else setTimeout(check, 10)
+    }
+    check()
+  })
 
   t.is(collected.length, 1)
   t.is(collected[0].event, 'BallHit')
@@ -117,11 +121,7 @@ test('RLStatsServiceLive handles chunked data', async (t) => {
 })
 
 test('RLStatsServiceLive emits schema errors', async (t) => {
-  const server = net.createServer()
-  server.listen(0, '127.0.0.1')
-  t.teardown(() => server.close())
-  await once(server, 'listening')
-  const port = server.address().port
+  const { server, port } = await setupTest(t)
 
   const errors = []
 
@@ -129,7 +129,7 @@ test('RLStatsServiceLive emits schema errors', async (t) => {
 
   const service = await getRLStatsService(port)
 
-  const fiber = Effect.runFork(
+  Effect.runFork(
     Stream.runForEach(service.parsed, (parsed) => {
       if (parsed.type === 'error') {
         errors.push(parsed)
@@ -138,9 +138,8 @@ test('RLStatsServiceLive emits schema errors', async (t) => {
     })
   )
 
-  await new Promise(resolve => setTimeout(resolve, 100))
-
   const [serverSocket] = await connectionPromise
+  t.teardown(() => serverSocket.destroy())
 
   serverSocket.write(JSON.stringify({
     Event: 'GoalScored',
@@ -155,18 +154,21 @@ test('RLStatsServiceLive emits schema errors', async (t) => {
     }
   }) + '\n')
 
-  await new Promise(resolve => setTimeout(resolve, 500))
+  // Wait for the error to be collected
+  await new Promise(resolve => {
+    const check = () => {
+      if (errors.length > 0) resolve()
+      else setTimeout(check, 10)
+    }
+    check()
+  })
 
   t.ok(errors.length > 0, 'schema error emitted')
   t.ok(errors[0].error, 'error object exists')
 })
 
 test('RLStatsServiceLive handles multiple events', async (t) => {
-  const server = net.createServer()
-  server.listen(0, '127.0.0.1')
-  t.teardown(() => server.close())
-  await once(server, 'listening')
-  const port = server.address().port
+  const { server, port } = await setupTest(t)
 
   const collected = []
 
@@ -174,7 +176,7 @@ test('RLStatsServiceLive handles multiple events', async (t) => {
 
   const service = await getRLStatsService(port)
 
-  const fiber = Effect.runFork(
+  Effect.runFork(
     Stream.runForEach(service.parsed, (parsed) => {
       if (parsed.type === 'event') {
         collected.push(parsed)
@@ -183,9 +185,8 @@ test('RLStatsServiceLive handles multiple events', async (t) => {
     })
   )
 
-  await new Promise(resolve => setTimeout(resolve, 100))
-
   const [serverSocket] = await connectionPromise
+  t.teardown(() => serverSocket.destroy())
 
   serverSocket.write(JSON.stringify({
     Event: 'GoalScored',
@@ -207,7 +208,14 @@ test('RLStatsServiceLive handles multiple events', async (t) => {
     }
   }) + '\n')
 
-  await new Promise(resolve => setTimeout(resolve, 500))
+  // Wait for both events to be collected
+  await new Promise(resolve => {
+    const check = () => {
+      if (collected.length >= 2) resolve()
+      else setTimeout(check, 10)
+    }
+    check()
+  })
 
   t.is(collected.length, 2)
   t.is(collected[0].event, 'GoalScored')

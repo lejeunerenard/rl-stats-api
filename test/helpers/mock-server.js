@@ -33,4 +33,17 @@ async function closeConnection (connection) {
   })
 }
 
-module.exports = { createServerAndConnection, sendEvent, closeConnection }
+async function setupTest(t, port) {
+  const server = net.createServer()
+  server.listen(port || 0, '127.0.0.1')
+
+  t.teardown(async () => {
+    server.close()
+  }, { order: 10 })
+
+  await once(server, 'listening')
+
+  return { server, port: port || server.address().port }
+}
+
+module.exports = { createServerAndConnection, sendEvent, closeConnection, setupTest }
