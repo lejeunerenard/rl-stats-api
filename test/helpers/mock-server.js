@@ -1,5 +1,6 @@
 const { once } = require('events')
 const net = require('net')
+const { Effect } = require('effect')
 
 const RLStatsAPI = require('../../dist/index.js').default
 
@@ -24,9 +25,10 @@ function sendEvent (socket, event, data) {
 }
 
 async function closeConnection (connection) {
-  connection.socket.end()
+  const socket = await Effect.runPromise(connection.socket)
+  socket.end()
   await new Promise(resolve => {
-    connection.socket.on('close', resolve)
+    socket.on('close', resolve)
     setTimeout(resolve, 1000)
   })
 }

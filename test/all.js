@@ -11,6 +11,7 @@ async function runTests () {
   await import('./schema/events.test.js')
   await import('./rl-stats-api.js')
   await import('./extract-one-object.js')
+  await import('./events-layer.js')
 
   test.resume()
 }

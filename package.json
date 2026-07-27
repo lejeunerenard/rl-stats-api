@@ -25,7 +25,8 @@
       "default": "fs"
     },
     "net": {
-      "bare": "bare-net"
+      "bare": "bare-net",
+      "default": "net"
     },
     "path": {
       "bare": "bare-path",
