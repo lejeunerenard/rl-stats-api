@@ -11,6 +11,24 @@
         "default": "./dist/index.js"
       },
       "default": "./dist/index.js"
+    },
+    "./layers/config": {
+      "bare": {
+        "default": "./dist/layers/config.js"
+      },
+      "default": "./dist/layers/config.js"
+    },
+    "./layers/connection": {
+      "bare": {
+        "default": "./dist/layers/connection.js"
+      },
+      "default": "./dist/layers/connection.js"
+    },
+    "./layers/events": {
+      "bare": {
+        "default": "./dist/layers/events.js"
+      },
+      "default": "./dist/layers/events.js"
     }
   },
  "imports": {
