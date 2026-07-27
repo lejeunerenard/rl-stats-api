@@ -4,13 +4,29 @@ import "bare-encoding/global"
 import EventEmitter from "events"
 import { Effect, Stream, Layer } from "effect"
 import { RLStatsService, RLStatsServiceLive } from "./layers/events.js"
-import { ConnectionServiceLive } from "./layers/connection.js"
-import { RLStatsConfig, defaultConfig } from "./layers/config.js"
+import { ConnectionService, ConnectionServiceLive } from "./layers/connection.js"
+import { RLStatsConfig, ConfigLive, defaultConfig } from "./layers/config.js"
 
 // Schema
 export * from "./schema/events.js"
 import { AllEvents } from "./schema/events.js"
 export type AllEventsType = typeof AllEvents.Type
+
+// Effect Services & Layers
+export {
+  RLStatsConfig,
+  ConfigLive,
+  defaultConfig,
+  ConnectionService,
+  ConnectionServiceLive,
+  RLStatsService,
+  RLStatsServiceLive
+}
+
+// Effect Service Interfaces
+export type { RLStatsConfig } from "./layers/config.js"
+export type { ConnectionLive } from "./layers/connection.js"
+export type { RLStatsLive, ParsedEvent, SchemaError } from "./layers/events.js"
 
 export class RLStatsAPI extends EventEmitter {
   private _started
