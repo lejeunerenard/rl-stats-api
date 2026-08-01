@@ -11,7 +11,7 @@
     "./layers/connection": "./dist/layers/connection.js",
     "./layers/events": "./dist/layers/events.js"
   },
- "imports": {
+  "imports": {
     "bare-encoding": {
       "bare": "bare-encoding"
     },

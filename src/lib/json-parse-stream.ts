@@ -1,8 +1,14 @@
-// @ts-nocheck
-import { Effect, Exit, Option } from "effect"
-import { decodeEventStrict } from "../schema/decode.js"
+import { Effect, Either, Option, pipe, ParseResult } from 'effect'
+import { decodeEventEitherStrict } from '../schema/decode.js'
+import type { AllEventsType } from "../schema/events.js"
 
-export function extractOneObject(working: string): Option<{ parsed: unknown; raw: string; remainder: string }> {
+interface ExtractedObject {
+  parsed: unknown
+  raw: string
+  remainder: string
+}
+
+export function extractOneObject(working: string): Option.Option<ExtractedObject> {
   if (working.length === 0) return Option.none()
 
   let start = 0
@@ -48,8 +54,7 @@ export function extractOneObject(working: string): Option<{ parsed: unknown; raw
         try {
           const obj = JSON.parse(str)
           return Option.some({ parsed: obj, raw: str, remainder: working.substring(i + 1) })
-        }
-        catch {
+        } catch {
           return Option.none()
         }
       }
@@ -59,19 +64,11 @@ export function extractOneObject(working: string): Option<{ parsed: unknown; raw
   return Option.none()
 }
 
-export interface ParsedEvent {
+interface EventResult {
   type: 'event'
   event: string
   data: unknown
 }
-
-export interface SchemaError {
-  type: 'error'
-  error: unknown
-  raw: string
-}
-
-export type ParseResult = ParsedEvent | SchemaError
 
 function normalizeEventData(raw: unknown): unknown {
   if (typeof raw !== 'object' || raw === null) return raw
@@ -86,8 +83,8 @@ function normalizeEventData(raw: unknown): unknown {
   return obj
 }
 
-export function decodeAndParse(str: string): { results: ParseResult[]; remainder: string } {
-  const results: ParseResult[] = []
+export function decodeAndParse(str: string): { results: Either.Either<AllEventsType, ParseResult.ParseError>[]; remainder: string } {
+  const results: Either.Either<AllEventsType, ParseResult.ParseError>[] = []
   let buffer = str
 
   while (true) {
@@ -98,14 +95,8 @@ export function decodeAndParse(str: string): { results: ParseResult[]; remainder
     buffer = remainder
 
     const normalized = normalizeEventData(parsed)
-    const exit = Effect.runSyncExit(decodeEventStrict(normalized))
-    if (Exit.isSuccess(exit)) {
-      const event = exit.value
-      results.push({ type: 'event', event: event.Event, data: event.Data })
-    }
-    else {
-      results.push({ type: 'error', error: exit.cause, raw })
-    }
+    const asEitherEvent = decodeEventEitherStrict(normalized)
+    results.push(asEitherEvent)
   }
 
   return { results, remainder: buffer }

@@ -1,5 +1,7 @@
-// @ts-nocheck
 import { Schema } from "effect"
+
+export type PlayerInfoType = Schema.Schema.Type<typeof PlayerInfo>
+export type Position3DType = Schema.Schema.Type<typeof Position3D>
 
 // ============================================================================
 // Shared Primitives
@@ -82,6 +84,12 @@ export const UpdateStateData = Schema.Struct({
   Game: UpdateStateGame
 })
 
+export type UpdateStatePlayerType = Schema.Schema.Type<typeof UpdateStatePlayer>
+export type UpdateStateTeamType = Schema.Schema.Type<typeof UpdateStateTeam>
+export type UpdateStateBallType = Schema.Schema.Type<typeof UpdateStateBall>
+export type UpdateStateGameType = Schema.Schema.Type<typeof UpdateStateGame>
+export type UpdateStateDataType = Schema.Schema.Type<typeof UpdateStateData>
+
 // ============================================================================
 // GoalScored Event Data
 // ============================================================================
@@ -99,6 +107,8 @@ export const GoalScoredData = Schema.Struct({
   })
 })
 
+export type GoalScoredDataType = Schema.Schema.Type<typeof GoalScoredData>
+
 // ============================================================================
 // BallHit Event Data
 // ============================================================================
@@ -113,6 +123,8 @@ export const BallHitData = Schema.Struct({
   })
 })
 
+export type BallHitDataType = Schema.Schema.Type<typeof BallHitData>
+
 // ============================================================================
 // ClockUpdatedSeconds Event Data
 // ============================================================================
@@ -122,6 +134,8 @@ export const ClockUpdatedSecondsData = Schema.Struct({
   TimeSeconds: Schema.Number,
   bOvertime: Schema.Boolean
 })
+
+export type ClockUpdatedSecondsDataType = Schema.Schema.Type<typeof ClockUpdatedSecondsData>
 
 // ============================================================================
 // Minimal Events (MatchGuid only)
@@ -145,6 +159,20 @@ export const ReplayCreatedData = MatchGuidEvent
 export const ReplayPlaybackStartData = MatchGuidEvent
 export const ReplayPlaybackEndData = MatchGuidEvent
 
+export type CountdownBeginDataType = Schema.Schema.Type<typeof CountdownBeginData>
+export type RoundStartedDataType = Schema.Schema.Type<typeof RoundStartedData>
+export type MatchCreatedDataType = Schema.Schema.Type<typeof MatchCreatedData>
+export type MatchDestroyedDataType = Schema.Schema.Type<typeof MatchDestroyedData>
+export type MatchPausedDataType = Schema.Schema.Type<typeof MatchPausedData>
+export type MatchUnpausedDataType = Schema.Schema.Type<typeof MatchUnpausedData>
+export type GoalReplayStartDataType = Schema.Schema.Type<typeof GoalReplayStartData>
+export type GoalReplayEndDataType = Schema.Schema.Type<typeof GoalReplayEndData>
+export type GoalReplayWillEndDataType = Schema.Schema.Type<typeof GoalReplayWillEndData>
+export type PodiumStartDataType = Schema.Schema.Type<typeof PodiumStartData>
+export type ReplayCreatedDataType = Schema.Schema.Type<typeof ReplayCreatedData>
+export type ReplayPlaybackStartDataType = Schema.Schema.Type<typeof ReplayPlaybackStartData>
+export type ReplayPlaybackEndDataType = Schema.Schema.Type<typeof ReplayPlaybackEndData>
+
 // ============================================================================
 // MatchInitialized (MatchGuid is REQUIRED)
 // ============================================================================
@@ -152,6 +180,8 @@ export const ReplayPlaybackEndData = MatchGuidEvent
 export const MatchInitializedData = Schema.Struct({
   MatchGuid: Schema.optionalWith(Schema.String, { exact: true })
 })
+
+export type MatchInitializedDataType = Schema.Schema.Type<typeof MatchInitializedData>
 
 // ============================================================================
 // MatchEnded Event Data
@@ -161,6 +191,8 @@ export const MatchEndedData = Schema.Struct({
   MatchGuid: Schema.optionalWith(Schema.String, { exact: true }),
   WinnerTeamNum: Schema.Number
 })
+
+export type MatchEndedDataType = Schema.Schema.Type<typeof MatchEndedData>
 
 // ============================================================================
 // StatfeedEvent Data
@@ -173,6 +205,8 @@ export const StatfeedEventData = Schema.Struct({
   MainTarget: PlayerInfo,
   SecondaryTarget: Schema.optionalWith(PlayerInfo, { exact: true })
 })
+
+export type StatfeedEventDataType = Schema.Schema.Type<typeof StatfeedEventData>
 
 // ============================================================================
 // CrossbarHit Event Data
@@ -188,6 +222,8 @@ export const CrossbarHitData = Schema.Struct({
     Speed: Schema.Number
   })
 })
+
+export type CrossbarHitDataType = Schema.Schema.Type<typeof CrossbarHitData>
 
 // ============================================================================
 // Wrapper Schemas (Event + Data)
@@ -242,3 +278,5 @@ export const AllEvents = Schema.Union(
   ReplayPlaybackStartSchema,
   ReplayPlaybackEndSchema
 )
+
+export type AllEventsType = Schema.Schema.Type<typeof AllEvents>

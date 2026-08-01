@@ -1,11 +1,17 @@
-// @ts-nocheck
-import "bare-encoding/global"
+import 'bare-encoding/global'
 
 import { header, command, flag } from 'paparam'
-import { Effect, Stream, Layer } from 'effect'
+import { Effect, Either, Stream, Layer, ParseResult } from 'effect'
 import { RLStatsService, RLStatsServiceLive } from './layers/events.js'
 import { ConnectionServiceLive } from './layers/connection.js'
 import { RLStatsConfig } from './layers/config.js'
+import type { AllEventsType } from './schema/events.js'
+
+interface SchemaFailure {
+  type: 'error'
+  error: unknown
+  raw: string
+}
 
 const cmd = command(
   'rl-stats-api-cli',
@@ -17,29 +23,35 @@ const cmd = command(
     const host = cmd.flags.host || '127.0.0.1'
 
     const service = await Effect.runPromise(
-      Effect.provide(RLStatsService, RLStatsServiceLive)
-        .pipe(
-          Effect.provide(ConnectionServiceLive),
-          Effect.provide(Layer.succeed(RLStatsConfig, { port, host }))
-        )
+      Effect.provide(RLStatsService, RLStatsServiceLive).pipe(
+        Effect.provide(ConnectionServiceLive),
+        Effect.provide(Layer.succeed(RLStatsConfig, { port, host }))
+      )
     )
 
     Effect.runFork(
-      Stream.runForEach(service.parsed, (parsed) => {
-        if (parsed.type === 'event') {
-          if (parsed.event === 'UpdateState') {
-            console.log('UpdateState', JSON.stringify(parsed.data, null, 2))
-          } else if (parsed.event === 'GoalScored') {
-            console.log('GoalScored', JSON.stringify(parsed.data, null, 2))
-          } else if (parsed.event === 'BallHit') {
-            console.log('BallHit', JSON.stringify(parsed.data, null, 2))
-          }
-        } else {
-          console.error('schema error:', parsed.error)
-          console.error('raw:', parsed.raw)
+      Stream.runForEach(
+        service.parsed,
+        (parsed: Either.Either<AllEventsType, ParseResult.ParseError>) => {
+          Either.match(parsed, {
+            onLeft: (error) => {
+              console.error('schema error:', error)
+              // TODO console.error('raw:', parsed.raw)
+            },
+            onRight: ({ Event, Data }) => {
+              const json = JSON.stringify(Data, null, 2)
+              if (Event === 'UpdateState') {
+                console.log('UpdateState', json)
+              } else if (Event === 'GoalScored') {
+                console.log('GoalScored', json)
+              } else if (Event === 'BallHit') {
+                console.log('BallHit', json)
+              }
+            }
+          })
+          return Effect.succeed(undefined)
         }
-        return Effect.succeed(undefined)
-      })
+      )
     )
   }
 )

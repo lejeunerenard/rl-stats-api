@@ -1,12 +1,13 @@
-// @ts-nocheck
-import { Effect, Schema } from "effect"
-import { AllEvents } from "./events.js"
+import { Effect, Schema, ParseResult, Either } from "effect"
+import { AllEvents, type AllEventsType } from "./events.js"
 
-export const decodeEvent = (input: unknown): Effect.Effect<typeof AllEvents.Type, Schema.ParseError> =>
+export const decodeEvent = (input: unknown): Effect.Effect<AllEventsType, ParseResult.ParseError> =>
   Schema.decodeUnknown(AllEvents)(input)
 
-export const decodeEventStrict = (input: unknown): Effect.Effect<typeof AllEvents.Type, Schema.ParseError> =>
+export const decodeEventStrict = (input: unknown): Effect.Effect<AllEventsType, ParseResult.ParseError> =>
   Schema.decodeUnknown(AllEvents)(input, { onExcessProperty: "error" })
 
-export const decodeEventSync = (input: unknown): Effect.Either<Schema.ParseError, typeof AllEvents.Type> =>
-  Schema.decodeUnknownEither(AllEvents)(input)
+export const decodeEventEither = Schema.decodeUnknownEither(AllEvents)
+
+export const decodeEventEitherStrict = (input: unknown): Either.Either<AllEventsType, ParseResult.ParseError> =>
+  Schema.decodeUnknownEither(AllEvents)(input, { onExcessProperty: "error" })

@@ -1,22 +1,19 @@
-// @ts-nocheck
 import "bare-encoding/global"
 
 import EventEmitter from "events"
-import { Effect, Stream, Layer } from "effect"
+import { Effect, Either, Stream, Layer, ParseResult } from "effect"
 import { RLStatsService, RLStatsServiceLive } from "./layers/events.js"
 import { ConnectionService, ConnectionServiceLive } from "./layers/connection.js"
-import { RLStatsConfig, ConfigLive, defaultConfig } from "./layers/config.js"
+import { RLStatsConfig, ConfigLive } from "./layers/config.js"
 
 // Schema
 export * from "./schema/events.js"
-import { AllEvents } from "./schema/events.js"
-export type AllEventsType = typeof AllEvents.Type
+import type { AllEventsType as AllEvents } from "./schema/events.js"
+export type AllEventsType = AllEvents
 
 // Effect Services & Layers
 export {
-  RLStatsConfig,
   ConfigLive,
-  defaultConfig,
   ConnectionService,
   ConnectionServiceLive,
   RLStatsService,
@@ -26,18 +23,29 @@ export {
 // Effect Service Interfaces
 export type { RLStatsConfig } from "./layers/config.js"
 export type { ConnectionLive } from "./layers/connection.js"
-export type { RLStatsLive, ParsedEvent, SchemaError } from "./layers/events.js"
+export type { RLStatsLive } from "./layers/events.js"
+
+import type { RLStatsLive } from "./layers/events.js"
+import type net from "net"
+
+interface SchemaFailure {
+  type: 'error'
+  error: unknown
+  raw: string
+}
 
 export class RLStatsAPI extends EventEmitter {
-  private _started
-  private _service
-  private _eventsFiber
+  port: number
+  host: string
+  private _started: boolean
+  private _service: RLStatsLive | null
+  private _eventsFiber: ReturnType<typeof Effect.runFork> | null
 
   get socket() {
     return this._service?.socket
   }
 
-  constructor(port = defaultConfig.port, host = defaultConfig.host) {
+  constructor(port, host) {
     super()
     this.port = port
     this.host = host
@@ -65,14 +73,17 @@ export class RLStatsAPI extends EventEmitter {
     this.emit("connected")
 
     this._eventsFiber = Effect.runFork(
-      Stream.runForEach(this._service.parsed, (parsed) => {
-        return Effect.sync(() => {
-          if (parsed.type === 'event') {
-            this.emit(parsed.event, parsed.data)
-          } else {
-            this.emit("schema:error", parsed)
+      Stream.runForEach(this._service.parsed, (parsed: Either.Either<AllEvents, ParseResult.ParseError>) => {
+        Either.match(parsed, {
+          onLeft: (error) => {
+            this.emit("schema:error", error)
+            // TODO console.error('raw:', parsed.raw)
+          },
+          onRight: ({ Event, Data }) => {
+            this.emit(Event, Data)
           }
         })
+        return Effect.succeed(undefined)
       })
     )
   }
@@ -82,7 +93,7 @@ export class RLStatsAPI extends EventEmitter {
     this._started = false
 
     if (this._service) {
-      await Effect.runPromise(this._service.socket).then(socket => socket.destroy())
+      await Effect.runPromise(this._service.socket).then((socket: net.Socket) => socket.destroy())
       this._service = null
     }
   }
