@@ -1,7 +1,7 @@
 const test = require('brittle')
 const net = require('net')
 const { once } = require('events')
-const { Effect, Stream, Layer } = require('effect')
+const { Effect, Stream, Layer, Either } = require('effect')
 const { RLStatsService, RLStatsServiceLive } = require('../dist/layers/events.js')
 const { ConnectionServiceLive } = require('../dist/layers/connection.js')
 const { RLStatsConfig } = require('../dist/layers/config.js')
@@ -29,11 +29,14 @@ test('RLStatsServiceLive emits parsed events', async (t) => {
 
   Effect.runFork(
     Stream.runForEach(service.parsed, (parsed) => {
-      if (parsed.type === 'event') {
-        collected.push(parsed)
-      } else {
-        errors.push(parsed)
-      }
+      Either.match(parsed, {
+        onLeft: (error) => {
+          errors.push(error)
+        },
+        onRight: (event) => {
+          collected.push(event)
+        }
+      })
       return Effect.succeed(undefined)
     })
   )
@@ -63,9 +66,9 @@ test('RLStatsServiceLive emits parsed events', async (t) => {
   })
 
   t.is(collected.length, 1)
-  t.is(collected[0].event, 'GoalScored')
-  t.ok(collected[0].data.MatchGuid === 'abc')
-  t.ok(collected[0].data.GoalSpeed === 87.3)
+  t.is(collected[0].Event, 'GoalScored')
+  t.ok(collected[0].Data.MatchGuid === 'abc')
+  t.ok(collected[0].Data.GoalSpeed === 87.3)
 })
 
 test('RLStatsServiceLive handles chunked data', async (t) => {
@@ -79,9 +82,12 @@ test('RLStatsServiceLive handles chunked data', async (t) => {
 
   Effect.runFork(
     Stream.runForEach(service.parsed, (parsed) => {
-      if (parsed.type === 'event') {
-        collected.push(parsed)
-      }
+      Either.match(parsed, {
+        onLeft: () => {},
+        onRight: (event) => {
+          collected.push(event)
+        }
+      })
       return Effect.succeed(undefined)
     })
   )
@@ -116,8 +122,8 @@ test('RLStatsServiceLive handles chunked data', async (t) => {
   })
 
   t.is(collected.length, 1)
-  t.is(collected[0].event, 'BallHit')
-  t.ok(collected[0].data.MatchGuid === 'chunked')
+  t.is(collected[0].Event, 'BallHit')
+  t.ok(collected[0].Data.MatchGuid === 'chunked')
 })
 
 test('RLStatsServiceLive emits schema errors', async (t) => {
@@ -131,9 +137,12 @@ test('RLStatsServiceLive emits schema errors', async (t) => {
 
   Effect.runFork(
     Stream.runForEach(service.parsed, (parsed) => {
-      if (parsed.type === 'error') {
-        errors.push(parsed)
-      }
+      Either.match(parsed, {
+        onLeft: (error) => {
+          errors.push(error)
+        },
+        onRight: () => {}
+      })
       return Effect.succeed(undefined)
     })
   )
@@ -164,7 +173,7 @@ test('RLStatsServiceLive emits schema errors', async (t) => {
   })
 
   t.ok(errors.length > 0, 'schema error emitted')
-  t.ok(errors[0].error, 'error object exists')
+  t.ok(errors[0], 'error object exists')
 })
 
 test('RLStatsServiceLive handles multiple events', async (t) => {
@@ -178,9 +187,12 @@ test('RLStatsServiceLive handles multiple events', async (t) => {
 
   Effect.runFork(
     Stream.runForEach(service.parsed, (parsed) => {
-      if (parsed.type === 'event') {
-        collected.push(parsed)
-      }
+      Either.match(parsed, {
+        onLeft: () => {},
+        onRight: (event) => {
+          collected.push(event)
+        }
+      })
       return Effect.succeed(undefined)
     })
   )
@@ -218,6 +230,6 @@ test('RLStatsServiceLive handles multiple events', async (t) => {
   })
 
   t.is(collected.length, 2)
-  t.is(collected[0].event, 'GoalScored')
-  t.is(collected[1].event, 'BallHit')
+  t.is(collected[0].Event, 'GoalScored')
+  t.is(collected[1].Event, 'BallHit')
 })
