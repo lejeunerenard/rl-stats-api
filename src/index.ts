@@ -28,12 +28,6 @@ export type { RLStatsLive } from "./layers/events.js"
 import type { RLStatsLive } from "./layers/events.js"
 import type net from "net"
 
-interface SchemaFailure {
-  type: 'error'
-  error: unknown
-  raw: string
-}
-
 export class RLStatsAPI extends EventEmitter {
   port: number
   host: string
@@ -45,7 +39,7 @@ export class RLStatsAPI extends EventEmitter {
     return this._service?.socket
   }
 
-  constructor(port, host) {
+  constructor(port: number, host: string) {
     super()
     this.port = port
     this.host = host

@@ -7,12 +7,6 @@ import { ConnectionServiceLive } from './layers/connection.js'
 import { RLStatsConfig } from './layers/config.js'
 import type { AllEventsType } from './schema/events.js'
 
-interface SchemaFailure {
-  type: 'error'
-  error: unknown
-  raw: string
-}
-
 const cmd = command(
   'rl-stats-api-cli',
   header('An app to collect data from the Stats API built into Rocket League'),

@@ -1,4 +1,4 @@
-import { Effect, Either, Option, pipe, ParseResult } from 'effect'
+import { Either, Option, ParseResult } from 'effect'
 import { decodeEventEitherStrict } from '../schema/decode.js'
 import type { AllEventsType } from "../schema/events.js"
 
@@ -62,12 +62,6 @@ export function extractOneObject(working: string): Option.Option<ExtractedObject
   }
 
   return Option.none()
-}
-
-interface EventResult {
-  type: 'event'
-  event: string
-  data: unknown
 }
 
 function normalizeEventData(raw: unknown): unknown {

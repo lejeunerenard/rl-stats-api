@@ -1,7 +1,6 @@
-import { Context, Effect, Either, Chunk, Option, Layer, Stream, Queue, ParseResult } from 'effect'
+import { Context, Effect, Either, Chunk, Option, Layer, Stream, ParseResult } from 'effect'
 import net from 'net'
 import { ConnectionService } from './connection.js'
-import type { ConnectionLive } from './connection.js'
 import { decodeAndParse } from '../lib/json-parse-stream.js'
 import { AllEvents } from '../schema/events.js'
 type AllEventsType = typeof AllEvents.Type
