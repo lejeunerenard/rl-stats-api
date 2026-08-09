@@ -5,15 +5,17 @@ const RLStatsAPI = require('../dist/index.js').default
 
 const { join } = require('path')
 const { createReadStream } = require('fs')
-const { createServerAndConnection, sendEvent, closeConnection } = require('./helpers/mock-server.js')
+const {
+  createServerAndConnection,
+  sendEvent,
+  closeConnection
+} = require('./helpers/mock-server.js')
 
 // Connection Events
 test('emits connected when socket opens', async (t) => {
   const server = net.createServer()
   server.listen(0, '127.0.0.1')
-  t.teardown(async () => {
-    server.close()
-  }, { order: 10 })
+  t.teardown(() => server.close(), { order: 10 })
   await once(server, 'listening')
   const port = server.address().port
 
@@ -44,34 +46,45 @@ test('forwards UpdateState event', async (t) => {
 
   sendEvent(socket, 'UpdateState', {
     MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6',
-    Players: [{
-      Name: 'PlayerA',
-      PrimaryId: 'Steam|123|0',
-      Shortcut: 1,
-      TeamNum: 0,
-      Score: 125,
-      Goals: 1,
-      Shots: 2,
-      Assists: 0,
-      Saves: 1,
-      Touches: 14,
-      CarTouches: 3,
-      Demos: 0,
-      bHasCar: true,
-      Speed: 1200,
-      Boost: 45,
-      bBoosting: true,
-      bOnGround: true,
-      bOnWall: false,
-      bPowersliding: false,
-      bDemolished: true,
-      Attacker: { Name: 'PlayerB', Shortcut: 2, TeamNum: 1 },
-      bSupersonic: true,
-      Loadout: ['body_grain', 'Skin_bartees', 'Wheel_SoccerBall', 'Boost_AlphaReward', 'None', 'None'],
-      PickupClass: 'SpecialPickup_GrapplingHook_TA'
-    }],
+    Players: [
+      {
+        Name: 'PlayerA',
+        PrimaryId: 'Steam|123|0',
+        Shortcut: 1,
+        TeamNum: 0,
+        Score: 125,
+        Goals: 1,
+        Shots: 2,
+        Assists: 0,
+        Saves: 1,
+        Touches: 14,
+        CarTouches: 3,
+        Demos: 0,
+        bHasCar: true,
+        Speed: 1200,
+        Boost: 45,
+        bBoosting: true,
+        bOnGround: true,
+        bOnWall: false,
+        bPowersliding: false,
+        bDemolished: true,
+        Attacker: { Name: 'PlayerB', Shortcut: 2, TeamNum: 1 },
+        bSupersonic: true,
+        Loadout: [
+          'body_grain',
+          'Skin_bartees',
+          'Wheel_SoccerBall',
+          'Boost_AlphaReward',
+          'None',
+          'None'
+        ],
+        PickupClass: 'SpecialPickup_GrapplingHook_TA'
+      }
+    ],
     Game: {
-      Teams: [{ Name: 'Blue', TeamNum: 0, Score: 1, ColorPrimary: '0000FF', ColorSecondary: '0000AA' }],
+      Teams: [
+        { Name: 'Blue', TeamNum: 0, Score: 1, ColorPrimary: '0000FF', ColorSecondary: '0000AA' }
+      ],
       TimeSeconds: 180,
       bOvertime: false,
       Frame: 120,
@@ -650,7 +663,7 @@ test('handles multiple events in a single write', async (t) => {
   const [goalData] = await once(connection, 'GoalScored')
 
   // Wait a tick for the second event to be processed
-  await new Promise(resolve => setImmediate(resolve))
+  await new Promise((resolve) => setImmediate(resolve))
 
   t.ok(goalData.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
   t.ok(goalData.Scorer.Name === 'PlayerA')
@@ -672,10 +685,21 @@ test('emits events in correct match lifecycle order', async (t) => {
   const stream = createReadStream(fixturePath, { highWaterMark: 4096 })
 
   const expectedEvents = [
-    'MatchCreated', 'MatchInitialized', 'CountdownBegin', 'RoundStarted',
-    'GoalScored', 'GoalReplayStart', 'GoalReplayWillEnd', 'GoalReplayEnd',
-    'GoalScored', 'GoalReplayStart', 'GoalReplayWillEnd', 'GoalReplayEnd',
-    'MatchEnded', 'PodiumStart', 'MatchDestroyed'
+    'MatchCreated',
+    'MatchInitialized',
+    'CountdownBegin',
+    'RoundStarted',
+    'GoalScored',
+    'GoalReplayStart',
+    'GoalReplayWillEnd',
+    'GoalReplayEnd',
+    'GoalScored',
+    'GoalReplayStart',
+    'GoalReplayWillEnd',
+    'GoalReplayEnd',
+    'MatchEnded',
+    'PodiumStart',
+    'MatchDestroyed'
   ]
 
   // Collect events as they arrive
@@ -697,7 +721,10 @@ test('emits events in correct match lifecycle order', async (t) => {
   }
 
   t.alike(received, expectedEvents.slice(0, lines.length), 'events received in correct order')
-  t.ok(matchGuids.every(g => g === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'), 'all events share same MatchGuid')
+  t.ok(
+    matchGuids.every((g) => g === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'),
+    'all events share same MatchGuid'
+  )
 })
 
 // Fixture was too big
@@ -741,34 +768,45 @@ test('preserves nested data structures', async (t) => {
 
   sendEvent(socket, 'UpdateState', {
     MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6',
-    Players: [{
-      Name: 'PlayerA',
-      PrimaryId: 'Steam|123|0',
-      Shortcut: 1,
-      TeamNum: 0,
-      Score: 125,
-      Goals: 1,
-      Shots: 2,
-      Assists: 0,
-      Saves: 1,
-      Touches: 14,
-      CarTouches: 3,
-      Demos: 0,
-      bHasCar: true,
-      Speed: 1200,
-      Boost: 45,
-      bBoosting: true,
-      bOnGround: true,
-      bOnWall: false,
-      bPowersliding: false,
-      bDemolished: true,
-      Attacker: { Name: 'PlayerB', Shortcut: 2, TeamNum: 1 },
-      bSupersonic: true,
-      Loadout: ['body_grain', 'Skin_bartees', 'Wheel_SoccerBall', 'Boost_AlphaReward', 'None', 'None'],
-      PickupClass: 'SpecialPickup_GrapplingHook_TA'
-    }],
+    Players: [
+      {
+        Name: 'PlayerA',
+        PrimaryId: 'Steam|123|0',
+        Shortcut: 1,
+        TeamNum: 0,
+        Score: 125,
+        Goals: 1,
+        Shots: 2,
+        Assists: 0,
+        Saves: 1,
+        Touches: 14,
+        CarTouches: 3,
+        Demos: 0,
+        bHasCar: true,
+        Speed: 1200,
+        Boost: 45,
+        bBoosting: true,
+        bOnGround: true,
+        bOnWall: false,
+        bPowersliding: false,
+        bDemolished: true,
+        Attacker: { Name: 'PlayerB', Shortcut: 2, TeamNum: 1 },
+        bSupersonic: true,
+        Loadout: [
+          'body_grain',
+          'Skin_bartees',
+          'Wheel_SoccerBall',
+          'Boost_AlphaReward',
+          'None',
+          'None'
+        ],
+        PickupClass: 'SpecialPickup_GrapplingHook_TA'
+      }
+    ],
     Game: {
-      Teams: [{ Name: 'Blue', TeamNum: 0, Score: 1, ColorPrimary: '0000FF', ColorSecondary: '0000AA' }],
+      Teams: [
+        { Name: 'Blue', TeamNum: 0, Score: 1, ColorPrimary: '0000FF', ColorSecondary: '0000AA' }
+      ],
       TimeSeconds: 180,
       bOvertime: false,
       Frame: 120,
@@ -821,20 +859,25 @@ test('handles empty arrays', async (t) => {
 
 test('rejects malformed event data', async (t) => {
   const { server, socket, connection } = await createServerAndConnection()
-  t.teardown(async () => { await closeConnection(connection); server.close() })
+  t.teardown(async () => {
+    await closeConnection(connection)
+    server.close()
+  })
 
-  socket.write(JSON.stringify({
-    Event: 'GoalScored',
-    Data: {
-      MatchGuid: 'abc',
-      GoalSpeed: 87.3,
-      GoalTime: 127.5,
-      ImpactLocation: { X: 0, Y: -2944, Z: 320 },
-      Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
-      BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 },
-      badField: true
-    }
-  }) + '\n')
+  socket.write(
+    JSON.stringify({
+      Event: 'GoalScored',
+      Data: {
+        MatchGuid: 'abc',
+        GoalSpeed: 87.3,
+        GoalTime: 127.5,
+        ImpactLocation: { X: 0, Y: -2944, Z: 320 },
+        Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
+        BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 },
+        badField: true
+      }
+    }) + '\n'
+  )
 
   const [error] = await once(connection, 'schema:error')
   t.ok(error, 'schema:error emitted for invalid data')

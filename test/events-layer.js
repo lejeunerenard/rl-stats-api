@@ -1,5 +1,4 @@
 const test = require('brittle')
-const net = require('net')
 const { once } = require('events')
 const { Effect, Stream, Layer, Either } = require('effect')
 const { RLStatsService, RLStatsServiceLive } = require('../dist/layers/events.js')
@@ -9,11 +8,10 @@ const { setupTest } = require('./helpers/mock-server.js')
 
 function getRLStatsService(port) {
   return Effect.runPromise(
-    Effect.provide(RLStatsService, RLStatsServiceLive)
-      .pipe(
-        Effect.provide(ConnectionServiceLive),
-        Effect.provide(Layer.succeed(RLStatsConfig, { port, host: '127.0.0.1' }))
-      )
+    Effect.provide(RLStatsService, RLStatsServiceLive).pipe(
+      Effect.provide(ConnectionServiceLive),
+      Effect.provide(Layer.succeed(RLStatsConfig, { port, host: '127.0.0.1' }))
+    )
   )
 }
 
@@ -44,20 +42,22 @@ test('RLStatsServiceLive emits parsed events', async (t) => {
   const [serverSocket] = await connectionPromise
   t.teardown(() => serverSocket.destroy())
 
-  serverSocket.write(JSON.stringify({
-    Event: 'GoalScored',
-    Data: {
-      MatchGuid: 'abc',
-      GoalSpeed: 87.3,
-      GoalTime: 127.5,
-      ImpactLocation: { X: 0, Y: -2944, Z: 320 },
-      Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
-      BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 }
-    }
-  }) + '\n')
+  serverSocket.write(
+    JSON.stringify({
+      Event: 'GoalScored',
+      Data: {
+        MatchGuid: 'abc',
+        GoalSpeed: 87.3,
+        GoalTime: 127.5,
+        ImpactLocation: { X: 0, Y: -2944, Z: 320 },
+        Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
+        BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 }
+      }
+    }) + '\n'
+  )
 
   // Wait for the event to be collected
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     const check = () => {
       if (collected.length > 0) resolve()
       else setTimeout(check, 10)
@@ -113,7 +113,7 @@ test('RLStatsServiceLive handles chunked data', async (t) => {
   }
 
   // Wait for the event to be collected
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     const check = () => {
       if (collected.length > 0) resolve()
       else setTimeout(check, 10)
@@ -150,21 +150,23 @@ test('RLStatsServiceLive emits schema errors', async (t) => {
   const [serverSocket] = await connectionPromise
   t.teardown(() => serverSocket.destroy())
 
-  serverSocket.write(JSON.stringify({
-    Event: 'GoalScored',
-    Data: {
-      MatchGuid: 'abc',
-      GoalSpeed: 87.3,
-      GoalTime: 127.5,
-      ImpactLocation: { X: 0, Y: -2944, Z: 320 },
-      Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
-      BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 },
-      badField: true
-    }
-  }) + '\n')
+  serverSocket.write(
+    JSON.stringify({
+      Event: 'GoalScored',
+      Data: {
+        MatchGuid: 'abc',
+        GoalSpeed: 87.3,
+        GoalTime: 127.5,
+        ImpactLocation: { X: 0, Y: -2944, Z: 320 },
+        Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
+        BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 },
+        badField: true
+      }
+    }) + '\n'
+  )
 
   // Wait for the error to be collected
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     const check = () => {
       if (errors.length > 0) resolve()
       else setTimeout(check, 10)
@@ -200,28 +202,32 @@ test('RLStatsServiceLive handles multiple events', async (t) => {
   const [serverSocket] = await connectionPromise
   t.teardown(() => serverSocket.destroy())
 
-  serverSocket.write(JSON.stringify({
-    Event: 'GoalScored',
-    Data: {
-      MatchGuid: 'multi',
-      GoalSpeed: 87.3,
-      GoalTime: 127.5,
-      ImpactLocation: { X: 0, Y: -2944, Z: 320 },
-      Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
-      BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 }
-    }
-  }) + '\n')
-  serverSocket.write(JSON.stringify({
-    Event: 'BallHit',
-    Data: {
-      MatchGuid: 'multi',
-      Players: [{ Name: 'PlayerB', Shortcut: 2, TeamNum: 1 }],
-      Ball: { PreHitSpeed: 100, PostHitSpeed: 1450.2, Location: { X: -512, Y: 100, Z: 200 } }
-    }
-  }) + '\n')
+  serverSocket.write(
+    JSON.stringify({
+      Event: 'GoalScored',
+      Data: {
+        MatchGuid: 'multi',
+        GoalSpeed: 87.3,
+        GoalTime: 127.5,
+        ImpactLocation: { X: 0, Y: -2944, Z: 320 },
+        Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
+        BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 }
+      }
+    }) + '\n'
+  )
+  serverSocket.write(
+    JSON.stringify({
+      Event: 'BallHit',
+      Data: {
+        MatchGuid: 'multi',
+        Players: [{ Name: 'PlayerB', Shortcut: 2, TeamNum: 1 }],
+        Ball: { PreHitSpeed: 100, PostHitSpeed: 1450.2, Location: { X: -512, Y: 100, Z: 200 } }
+      }
+    }) + '\n'
+  )
 
   // Wait for both events to be collected
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     const check = () => {
       if (collected.length >= 2) resolve()
       else setTimeout(check, 10)

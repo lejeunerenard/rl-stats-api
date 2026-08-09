@@ -1,19 +1,24 @@
-require("bare-encoding/global") // Necessary for `effect`
+require('bare-encoding/global') // Necessary for `effect`
 const test = require('brittle')
 const fs = require('fs')
 const path = require('path')
 const { decodeEventStrict } = require('../../dist/schema/decode.js')
 const { Exit, Effect } = require('effect')
 
-test('UpdateStateSchema validates fixture data', async (t) => {
-  const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, '../fixtures/update-state-simple.json'), 'utf8'))
+test('UpdateStateSchema validates fixture data', (t) => {
+  const fixture = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '../fixtures/update-state-simple.json'), 'utf8')
+  )
   const effect = decodeEventStrict(fixture)
   const result = Effect.runSyncExit(effect)
   t.ok(Exit.isSuccess(result), 'fixture validates against UpdateStateSchema')
 })
 
-test('Match lifecycle fixture events all validate', async (t) => {
-  const lines = fs.readFileSync(path.join(__dirname, '../fixtures/match-lifecycle.txt'), 'utf8').trim().split('\n')
+test('Match lifecycle fixture events all validate', (t) => {
+  const lines = fs
+    .readFileSync(path.join(__dirname, '../fixtures/match-lifecycle.txt'), 'utf8')
+    .trim()
+    .split('\n')
   for (const line of lines) {
     const raw = JSON.parse(line)
     const effect = decodeEventStrict(raw)
@@ -22,7 +27,7 @@ test('Match lifecycle fixture events all validate', async (t) => {
   }
 })
 
-test('Schema rejects unknown fields (strict mode)', async (t) => {
+test('Schema rejects unknown fields (strict mode)', (t) => {
   const input = {
     Event: 'GoalScored',
     Data: {

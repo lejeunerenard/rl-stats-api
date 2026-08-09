@@ -1,9 +1,8 @@
 const test = require('brittle')
-require("bare-encoding/global")
+require('bare-encoding/global')
 
 const { Option } = require('effect')
 const { join } = require('path')
-const { createReadStream } = require('fs')
 const { extractOneObject } = require('../dist/lib/json-parse-stream.js')
 
 function parseAll(input) {
@@ -20,7 +19,7 @@ function parseAll(input) {
   return results
 }
 
-test('parseJSONStream - parses json 100bytes at a time', async (t) => {
+test('parseJSONStream - parses json 100bytes at a time', (t) => {
   const fixturePath = join(__dirname, './fixtures/update-state-simple.json')
   const fs = require('fs')
   const content = fs.readFileSync(fixturePath, 'utf8')
@@ -40,13 +39,13 @@ test('parseJSONStream - parses json 100bytes at a time', async (t) => {
   t.alike(result, [json], 'parses json emitted per line')
 })
 
-test('parseJSONStream - parse json even when emitted with start of next', async (t) => {
+test('parseJSONStream - parse json even when emitted with start of next', (t) => {
   const input = '{ "foo": "bar" }{ "biz": "baz" }'
   const result = parseAll(input)
   t.alike(result, [{ foo: 'bar' }, { biz: 'baz' }], 'returns two objs')
 })
 
-test('parseJSONStream - handles split across multiple writes', async (t) => {
+test('parseJSONStream - handles split across multiple writes', (t) => {
   const json = JSON.stringify({
     Event: 'GoalScored',
     Data: {
@@ -71,7 +70,7 @@ test('parseJSONStream - handles split across multiple writes', async (t) => {
   t.ok(result[0].Data.GoalSpeed === 87.3)
 })
 
-test('parseJSONStream - handles multiple events in single input', async (t) => {
+test('parseJSONStream - handles multiple events in single input', (t) => {
   const event1 = JSON.stringify({
     Event: 'GoalScored',
     Data: {

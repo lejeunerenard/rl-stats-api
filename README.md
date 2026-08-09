@@ -54,10 +54,10 @@ connection.on('MatchEnded', (data) => {
 
 Creates a connection to the Rocket League Stats API websocket.
 
-| Parameter | Type   | Default       | Description                          |
-|-----------|--------|---------------|--------------------------------------|
-| `port`    | number | `49123`       | Stats API websocket port             |
-| `host`    | string | `'127.0.0.1'` | Stats API websocket host             |
+| Parameter | Type   | Default       | Description              |
+| --------- | ------ | ------------- | ------------------------ |
+| `port`    | number | `49123`       | Stats API websocket port |
+| `host`    | string | `'127.0.0.1'` | Stats API websocket host |
 
 ### Events
 
@@ -65,10 +65,10 @@ The API inherits from `events.EventEmitter`. All events listed below are also em
 
 #### Connection Events
 
-| Event                  | Data     | Description                     |
-|------------------------|----------|---------------------------------|
-| `connected`            | —        | Socket connection established   |
-| `connection:error`     | `Error`  | Socket-level error occurred     |
+| Event              | Data    | Description                   |
+| ------------------ | ------- | ----------------------------- |
+| `connected`        | —       | Socket connection established |
+| `connection:error` | `Error` | Socket-level error occurred   |
 
 #### Gameplay Events
 
@@ -198,10 +198,10 @@ node ./bin.js --port 49123 --host 127.0.0.1
 npm start -- --port 49123
 ```
 
-| Flag         | Short | Description                   |
-|--------------|-------|-------------------------------|
-| `--port`     | `-p`  | Stats API websocket port      |
-| `--host`     |       | Stats API websocket host      |
+| Flag     | Short | Description              |
+| -------- | ----- | ------------------------ |
+| `--port` | `-p`  | Stats API websocket port |
+| `--host` |       | Stats API websocket host |
 
 ## Running Tests
 

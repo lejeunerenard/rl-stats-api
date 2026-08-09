@@ -1,6 +1,6 @@
 import { Either, Option, ParseResult } from 'effect'
 import { decodeEventEitherStrict } from '../schema/decode.js'
-import type { AllEventsType } from "../schema/events.js"
+import type { AllEventsType } from '../schema/events.js'
 
 interface ExtractedObject {
   parsed: unknown
@@ -77,7 +77,10 @@ function normalizeEventData(raw: unknown): unknown {
   return obj
 }
 
-export function decodeAndParse(str: string): { results: Either.Either<AllEventsType, ParseResult.ParseError>[]; remainder: string } {
+export function decodeAndParse(str: string): {
+  results: Either.Either<AllEventsType, ParseResult.ParseError>[]
+  remainder: string
+} {
   const results: Either.Either<AllEventsType, ParseResult.ParseError>[] = []
   let buffer = str
 

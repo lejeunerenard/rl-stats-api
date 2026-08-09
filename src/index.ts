@@ -1,32 +1,26 @@
-import "bare-encoding/global"
+import 'bare-encoding/global'
 
-import EventEmitter from "events"
-import { Effect, Either, Stream, Layer, ParseResult } from "effect"
-import { RLStatsService, RLStatsServiceLive } from "./layers/events.js"
-import { ConnectionService, ConnectionServiceLive } from "./layers/connection.js"
-import { RLStatsConfig, ConfigLive } from "./layers/config.js"
+import EventEmitter from 'events'
+import { Effect, Either, Stream, Layer, ParseResult } from 'effect'
+import { RLStatsService, RLStatsServiceLive } from './layers/events.js'
+import { ConnectionService, ConnectionServiceLive } from './layers/connection.js'
+import { RLStatsConfig, ConfigLive } from './layers/config.js'
 
 // Schema
-export * from "./schema/events.js"
-import type { AllEventsType as AllEvents } from "./schema/events.js"
+export * from './schema/events.js'
+import type { AllEventsType as AllEvents } from './schema/events.js'
 export type AllEventsType = AllEvents
 
 // Effect Services & Layers
-export {
-  ConfigLive,
-  ConnectionService,
-  ConnectionServiceLive,
-  RLStatsService,
-  RLStatsServiceLive
-}
+export { ConfigLive, ConnectionService, ConnectionServiceLive, RLStatsService, RLStatsServiceLive }
 
 // Effect Service Interfaces
-export type { RLStatsConfig } from "./layers/config.js"
-export type { ConnectionLive } from "./layers/connection.js"
-export type { RLStatsLive } from "./layers/events.js"
+export type { RLStatsConfig } from './layers/config.js'
+export type { ConnectionLive } from './layers/connection.js'
+export type { RLStatsLive } from './layers/events.js'
 
-import type { RLStatsLive } from "./layers/events.js"
-import type net from "net"
+import type { RLStatsLive } from './layers/events.js'
+import type net from 'net'
 
 export class RLStatsAPI extends EventEmitter {
   port: number
@@ -56,29 +50,31 @@ export class RLStatsAPI extends EventEmitter {
     const { port, host } = this
 
     this._service = Effect.runSync(
-      Effect.provide(RLStatsService, RLStatsServiceLive)
-        .pipe(
-          Effect.provide(ConnectionServiceLive),
-          Effect.provide(Layer.succeed(RLStatsConfig, { port, host }))
-        )
+      Effect.provide(RLStatsService, RLStatsServiceLive).pipe(
+        Effect.provide(ConnectionServiceLive),
+        Effect.provide(Layer.succeed(RLStatsConfig, { port, host }))
+      )
     )
 
     await Effect.runPromise(this._service.connected)
-    this.emit("connected")
+    this.emit('connected')
 
     this._eventsFiber = Effect.runFork(
-      Stream.runForEach(this._service.parsed, (parsed: Either.Either<AllEvents, ParseResult.ParseError>) => {
-        Either.match(parsed, {
-          onLeft: (error) => {
-            this.emit("schema:error", error)
-            // TODO console.error('raw:', parsed.raw)
-          },
-          onRight: ({ Event, Data }) => {
-            this.emit(Event, Data)
-          }
-        })
-        return Effect.succeed(undefined)
-      })
+      Stream.runForEach(
+        this._service.parsed,
+        (parsed: Either.Either<AllEvents, ParseResult.ParseError>) => {
+          Either.match(parsed, {
+            onLeft: (error) => {
+              this.emit('schema:error', error)
+              // TODO console.error('raw:', parsed.raw)
+            },
+            onRight: ({ Event, Data }) => {
+              this.emit(Event, Data)
+            }
+          })
+          return Effect.succeed(undefined)
+        }
+      )
     )
   }
 

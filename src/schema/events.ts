@@ -1,7 +1,4 @@
-import { Schema } from "effect"
-
-export type PlayerInfoType = Schema.Schema.Type<typeof PlayerInfo>
-export type Position3DType = Schema.Schema.Type<typeof Position3D>
+import { Schema } from 'effect'
 
 // ============================================================================
 // Shared Primitives
@@ -30,14 +27,14 @@ export const PlayerInfo = Schema.Struct({
   Shortcut: Schema.Number,
   TeamNum: Schema.Number
 })
+export type PlayerInfoType = Schema.Schema.Type<typeof PlayerInfo>
 
 export const Position3D = Schema.Struct({
   X: Schema.Number,
   Y: Schema.Number,
   Z: Schema.Number
 })
-
-
+export type Position3DType = Schema.Schema.Type<typeof Position3D>
 
 // ============================================================================
 // UpdateState Event Data
@@ -288,28 +285,91 @@ export type PlayerLeftDataType = Schema.Schema.Type<typeof PlayerLeftData>
 // Wrapper Schemas (Event + Data)
 // ============================================================================
 
-export const UpdateStateSchema = Schema.Struct({ Event: Schema.Literal("UpdateState"), Data: UpdateStateData })
-export const GoalScoredSchema = Schema.Struct({ Event: Schema.Literal("GoalScored"), Data: GoalScoredData })
-export const BallHitSchema = Schema.Struct({ Event: Schema.Literal("BallHit"), Data: BallHitData })
-export const ClockUpdatedSecondsSchema = Schema.Struct({ Event: Schema.Literal("ClockUpdatedSeconds"), Data: ClockUpdatedSecondsData })
-export const CountdownBeginSchema = Schema.Struct({ Event: Schema.Literal("CountdownBegin"), Data: CountdownBeginData })
-export const RoundStartedSchema = Schema.Struct({ Event: Schema.Literal("RoundStarted"), Data: RoundStartedData })
-export const MatchCreatedSchema = Schema.Struct({ Event: Schema.Literal("MatchCreated"), Data: MatchCreatedData })
-export const MatchInitializedSchema = Schema.Struct({ Event: Schema.Literal("MatchInitialized"), Data: MatchInitializedData })
-export const MatchEndedSchema = Schema.Struct({ Event: Schema.Literal("MatchEnded"), Data: MatchEndedData })
-export const MatchDestroyedSchema = Schema.Struct({ Event: Schema.Literal("MatchDestroyed"), Data: MatchDestroyedData })
-export const MatchPausedSchema = Schema.Struct({ Event: Schema.Literal("MatchPaused"), Data: MatchPausedData })
-export const MatchUnpausedSchema = Schema.Struct({ Event: Schema.Literal("MatchUnpaused"), Data: MatchUnpausedData })
-export const StatfeedEventSchema = Schema.Struct({ Event: Schema.Literal("StatfeedEvent"), Data: StatfeedEventData })
-export const CrossbarHitSchema = Schema.Struct({ Event: Schema.Literal("CrossbarHit"), Data: CrossbarHitData })
-export const GoalReplayStartSchema = Schema.Struct({ Event: Schema.Literal("GoalReplayStart"), Data: GoalReplayStartData })
-export const GoalReplayEndSchema = Schema.Struct({ Event: Schema.Literal("GoalReplayEnd"), Data: GoalReplayEndData })
-export const GoalReplayWillEndSchema = Schema.Struct({ Event: Schema.Literal("GoalReplayWillEnd"), Data: GoalReplayWillEndData })
-export const PodiumStartSchema = Schema.Struct({ Event: Schema.Literal("PodiumStart"), Data: PodiumStartData })
-export const ReplayCreatedSchema = Schema.Struct({ Event: Schema.Literal("ReplayCreated"), Data: ReplayCreatedData })
-export const BoostPickupSchema = Schema.Struct({ Event: Schema.Literal("BoostPickup"), Data: BoostPickupData })
-export const PlayerJoinedSchema = Schema.Struct({ Event: Schema.Literal("PlayerJoined"), Data: PlayerJoinedData })
-export const PlayerLeftSchema = Schema.Struct({ Event: Schema.Literal("PlayerLeft"), Data: PlayerLeftData })
+export const UpdateStateSchema = Schema.Struct({
+  Event: Schema.Literal('UpdateState'),
+  Data: UpdateStateData
+})
+export const GoalScoredSchema = Schema.Struct({
+  Event: Schema.Literal('GoalScored'),
+  Data: GoalScoredData
+})
+export const BallHitSchema = Schema.Struct({ Event: Schema.Literal('BallHit'), Data: BallHitData })
+export const ClockUpdatedSecondsSchema = Schema.Struct({
+  Event: Schema.Literal('ClockUpdatedSeconds'),
+  Data: ClockUpdatedSecondsData
+})
+export const CountdownBeginSchema = Schema.Struct({
+  Event: Schema.Literal('CountdownBegin'),
+  Data: CountdownBeginData
+})
+export const RoundStartedSchema = Schema.Struct({
+  Event: Schema.Literal('RoundStarted'),
+  Data: RoundStartedData
+})
+export const MatchCreatedSchema = Schema.Struct({
+  Event: Schema.Literal('MatchCreated'),
+  Data: MatchCreatedData
+})
+export const MatchInitializedSchema = Schema.Struct({
+  Event: Schema.Literal('MatchInitialized'),
+  Data: MatchInitializedData
+})
+export const MatchEndedSchema = Schema.Struct({
+  Event: Schema.Literal('MatchEnded'),
+  Data: MatchEndedData
+})
+export const MatchDestroyedSchema = Schema.Struct({
+  Event: Schema.Literal('MatchDestroyed'),
+  Data: MatchDestroyedData
+})
+export const MatchPausedSchema = Schema.Struct({
+  Event: Schema.Literal('MatchPaused'),
+  Data: MatchPausedData
+})
+export const MatchUnpausedSchema = Schema.Struct({
+  Event: Schema.Literal('MatchUnpaused'),
+  Data: MatchUnpausedData
+})
+export const StatfeedEventSchema = Schema.Struct({
+  Event: Schema.Literal('StatfeedEvent'),
+  Data: StatfeedEventData
+})
+export const CrossbarHitSchema = Schema.Struct({
+  Event: Schema.Literal('CrossbarHit'),
+  Data: CrossbarHitData
+})
+export const GoalReplayStartSchema = Schema.Struct({
+  Event: Schema.Literal('GoalReplayStart'),
+  Data: GoalReplayStartData
+})
+export const GoalReplayEndSchema = Schema.Struct({
+  Event: Schema.Literal('GoalReplayEnd'),
+  Data: GoalReplayEndData
+})
+export const GoalReplayWillEndSchema = Schema.Struct({
+  Event: Schema.Literal('GoalReplayWillEnd'),
+  Data: GoalReplayWillEndData
+})
+export const PodiumStartSchema = Schema.Struct({
+  Event: Schema.Literal('PodiumStart'),
+  Data: PodiumStartData
+})
+export const ReplayCreatedSchema = Schema.Struct({
+  Event: Schema.Literal('ReplayCreated'),
+  Data: ReplayCreatedData
+})
+export const BoostPickupSchema = Schema.Struct({
+  Event: Schema.Literal('BoostPickup'),
+  Data: BoostPickupData
+})
+export const PlayerJoinedSchema = Schema.Struct({
+  Event: Schema.Literal('PlayerJoined'),
+  Data: PlayerJoinedData
+})
+export const PlayerLeftSchema = Schema.Struct({
+  Event: Schema.Literal('PlayerLeft'),
+  Data: PlayerLeftData
+})
 
 // ============================================================================
 // Discriminated Union

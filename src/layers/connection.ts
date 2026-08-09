@@ -1,7 +1,7 @@
-import { Context, Effect, Layer, Stream } from "effect"
-import { PassThrough } from "stream"
-import net from "net"
-import { RLStatsConfig } from "./config.js"
+import { Context, Effect, Layer, Stream } from 'effect'
+import { PassThrough } from 'stream'
+import net from 'net'
+import { RLStatsConfig } from './config.js'
 
 export interface ConnectionLive {
   readonly socket: Effect.Effect<net.Socket>
@@ -10,7 +10,10 @@ export interface ConnectionLive {
   readonly closed: Effect.Effect<void, never, never>
 }
 
-export class ConnectionService extends Context.Tag("@rlstats/Connection")<ConnectionService, ConnectionLive>() {}
+export class ConnectionService extends Context.Tag('@rlstats/Connection')<
+  ConnectionService,
+  ConnectionLive
+>() {}
 
 export const ConnectionServiceLive = Layer.effect(
   ConnectionService,
@@ -29,19 +32,19 @@ export const ConnectionServiceLive = Layer.effect(
     const data = Stream.fromAsyncIterable(reader(), () => 'stream-error')
 
     const connected = new Promise<void>((resolve, reject) => {
-      socket.once("connect", () => resolve())
-      socket.once("error", (err) => reject(err))
+      socket.once('connect', () => resolve())
+      socket.once('error', (err) => reject(err))
     })
 
     const closed = new Promise<void>((resolve) => {
-      socket.once("close", () => resolve())
+      socket.once('close', () => resolve())
     })
 
-    socket.on("data", (chunk: Buffer) => {
+    socket.on('data', (chunk: Buffer) => {
       passthrough.write(chunk)
     })
 
-    socket.on("close", () => {
+    socket.on('close', () => {
       passthrough.end()
     })
 

@@ -4,7 +4,7 @@ const { Effect } = require('effect')
 
 const RLStatsAPI = require('../../dist/index.js').default
 
-async function createServerAndConnection () {
+async function createServerAndConnection() {
   const server = net.createServer()
   server.listen(0, '127.0.0.1')
   await once(server, 'listening')
@@ -20,14 +20,14 @@ async function createServerAndConnection () {
   return { server, socket, connection, port }
 }
 
-function sendEvent (socket, event, data) {
+function sendEvent(socket, event, data) {
   socket.write(JSON.stringify({ Event: event, Data: data }) + '\n')
 }
 
-async function closeConnection (connection) {
+async function closeConnection(connection) {
   const socket = await Effect.runPromise(connection.socket)
   socket.end()
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     socket.on('close', resolve)
     setTimeout(resolve, 1000)
   })
@@ -37,9 +37,7 @@ async function setupTest(t, port) {
   const server = net.createServer()
   server.listen(port || 0, '127.0.0.1')
 
-  t.teardown(async () => {
-    server.close()
-  }, { order: 10 })
+  t.teardown(() => server.close(), { order: 10 })
 
   await once(server, 'listening')
 

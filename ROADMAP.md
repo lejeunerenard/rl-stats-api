@@ -26,7 +26,7 @@ Development priorities and planned improvements for `rl-stats-api`.
 
 ```js
 connection.on('GoalScored', (data) => {
-  data.Scorer.Name  // autocomplete works
+  data.Scorer.Name // autocomplete works
 })
 ```
 
@@ -50,6 +50,7 @@ Why it matters: Prevents typos in event names at compile time. Gives consumers c
 **Completed:** Created `test/rl-stats-api.js` with tests for: connection events (connected, connection:error), event forwarding for all 19 event types (individual tests per type), chunked data handling (split writes, multiple events per write), match lifecycle ordering (15-event sequence), and data integrity (nested structures, empty arrays). Added `test/fixtures/match-lifecycle.txt` fixture file.
 
 **Audit fixes applied (matching official docs at https://www.rocketleague.com/developer/stats-api):**
+
 - `MatchCreatedData`: Removed non-`MatchGuid` fields (`MatchType`, `GameMode`, `MapName`, `TeamSize`, `bIsRanked`, `bIsTournament`, `bIsMatchmaking`, `Teams`)
 - `MatchEndedData`: Removed non-`MatchGuid`/`WinnerTeamNum` field (`ScoreByTeam`)
 - `GoalReplayStartData`: Removed non-`MatchGuid` fields (`Scorer`, `Assister`, `GoalSpeed`, `GoalTime`, `ImpactLocation`)
@@ -108,4 +109,3 @@ match.on('destroy', () => { ... })
 **Completed:** Created `tsconfig.json`, converted `index.js`, `bin.js`, and `lib/json-parse-stream.js` to TypeScript, added `build` script, configured `dist/` output, and updated `package.json` with `exports`, `main`, `bin`, and `types` fields.
 
 **Why it matters:** Enables the type safety improvements in items 1 and 3. Provides a clean separation between source and compiled output.
-
