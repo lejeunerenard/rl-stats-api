@@ -103,6 +103,7 @@ test('extractOneObject - handles complex RLStats UpdateState event', (t) => {
         Teams: [
           { Name: 'Blue', TeamNum: 0, Score: 1, ColorPrimary: '0000FF', ColorSecondary: '0000AA' }
         ],
+        PlaylistId: 11,
         TimeSeconds: 180,
         bOvertime: false,
         Frame: 120,
@@ -165,6 +166,7 @@ test('extractOneObject - handles UpdateState event followed by newline', (t) => 
           Teams: [
             { Name: 'Blue', TeamNum: 0, Score: 1, ColorPrimary: '0000FF', ColorSecondary: '0000AA' }
           ],
+          PlaylistId: 11,
           TimeSeconds: 180,
           bOvertime: false,
           Frame: 120,

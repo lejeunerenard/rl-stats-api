@@ -92,7 +92,8 @@ export const UpdateStateGame = Schema.Struct({
   Winner: Schema.optionalWith(Schema.String, { exact: true }),
   Arena: Schema.String,
   bHasTarget: Schema.Boolean,
-  Target: Schema.optionalWith(PlayerInfo, { exact: true })
+  Target: Schema.optionalWith(PlayerInfo, { exact: true }),
+  PlaylistId: Schema.Number
 })
 
 export const UpdateStateData = Schema.Struct({

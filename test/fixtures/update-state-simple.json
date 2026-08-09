@@ -42,6 +42,7 @@
           "ColorSecondary": "0000AA"
         }
       ],
+      "PlaylistId": 11,
       "TimeSeconds": 180,
       "bOvertime": false,
       "Frame": 120,
