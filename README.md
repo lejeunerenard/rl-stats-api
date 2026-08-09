@@ -79,7 +79,7 @@ All event types listed below follow the [Rocket League Stats API specification](
 ```js
 rlstats.on('UpdateState', (data) => {
   // data.MatchGuid
-  // data.Players[] — player stats (Name, Score, Goals, Shots, Saves, Speed, Boost, etc.)
+  // data.Players[] — player stats (Name, Score, Goals, Shots, Saves, Speed, Boost, Loadout, PickupClass, etc.)
   // data.Game.Teams[] — { Name, TeamNum, Score, ColorPrimary, ColorSecondary }
   // data.Game.TimeSeconds, data.Game.bOvertime
   // data.Game.Ball — { Speed, TeamNum }
@@ -154,6 +154,35 @@ rlstats.on('StatfeedEvent', (data) => {
 **`PodiumStart`** — Sent when the game enters the podium state after the match.
 
 **`ReplayCreated`** — Sent when a replay is initialized (from Match History, not goal replays).
+
+**`BoostPickup`** — Sent when a vehicle collects a boost pad or pill (SPECTATOR).
+
+```js
+rlstats.on('BoostPickup', (data) => {
+  // data.Player — { Name, Shortcut, TeamNum }
+  // data.Location — { X, Y, Z }
+  // data.BoostAmount, data.BoostType (e.g. "BoostType_Pad", "BoostType_Pill")
+  // data.bReplay
+})
+```
+
+**`PlayerJoined`** — Sent when a player is added to the current match.
+
+```js
+rlstats.on('PlayerJoined', (data) => {
+  // data.PlayerName
+  // data.PrimaryId (e.g. "Steam|123|0")
+})
+```
+
+**`PlayerLeft`** — Sent when a player is removed from the current match.
+
+```js
+rlstats.on('PlayerLeft', (data) => {
+  // data.PlayerName
+  // data.PrimaryId (e.g. "Steam|123|0")
+})
+```
 
 > **Note:** `MatchGuid` is only set for online or LAN matches. Fields marked `CONDITIONAL` in the official spec only appear when relevant. Fields marked `SPECTATOR` only appear if the client is spectating or on the player's team.
 

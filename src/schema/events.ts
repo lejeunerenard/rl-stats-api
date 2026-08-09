@@ -38,6 +38,7 @@ export const UpdateStatePlayer = Schema.Struct({
   Touches: Schema.Number,
   CarTouches: Schema.Number,
   Demos: Schema.Number,
+  Loadout: Schema.optionalWith(Schema.Array(Schema.String), { exact: true }),
   bHasCar: Schema.optionalWith(Schema.Boolean, { exact: true }),
   Speed: Schema.optionalWith(Schema.Number, { exact: true }),
   Boost: Schema.optionalWith(Schema.Number, { exact: true }),
@@ -47,7 +48,8 @@ export const UpdateStatePlayer = Schema.Struct({
   bPowersliding: Schema.optionalWith(Schema.Boolean, { exact: true }),
   bDemolished: Schema.optionalWith(Schema.Boolean, { exact: true }),
   Attacker: Schema.optionalWith(PlayerInfo, { exact: true }),
-  bSupersonic: Schema.optionalWith(Schema.Boolean, { exact: true })
+  bSupersonic: Schema.optionalWith(Schema.Boolean, { exact: true }),
+  PickupClass: Schema.optionalWith(Schema.String, { exact: true })
 })
 
 export const UpdateStateTeam = Schema.Struct({
@@ -155,9 +157,11 @@ export const GoalReplayStartData = MatchGuidEvent
 export const GoalReplayEndData = MatchGuidEvent
 export const GoalReplayWillEndData = MatchGuidEvent
 export const PodiumStartData = MatchGuidEvent
-export const ReplayCreatedData = MatchGuidEvent
-export const ReplayPlaybackStartData = MatchGuidEvent
-export const ReplayPlaybackEndData = MatchGuidEvent
+export const ReplayCreatedData = Schema.Struct({
+  MatchGuid: Schema.optionalWith(Schema.String, { exact: true }),
+  FileName: Schema.String,
+  Date: Schema.Date
+})
 
 export type CountdownBeginDataType = Schema.Schema.Type<typeof CountdownBeginData>
 export type RoundStartedDataType = Schema.Schema.Type<typeof RoundStartedData>
@@ -170,8 +174,6 @@ export type GoalReplayEndDataType = Schema.Schema.Type<typeof GoalReplayEndData>
 export type GoalReplayWillEndDataType = Schema.Schema.Type<typeof GoalReplayWillEndData>
 export type PodiumStartDataType = Schema.Schema.Type<typeof PodiumStartData>
 export type ReplayCreatedDataType = Schema.Schema.Type<typeof ReplayCreatedData>
-export type ReplayPlaybackStartDataType = Schema.Schema.Type<typeof ReplayPlaybackStartData>
-export type ReplayPlaybackEndDataType = Schema.Schema.Type<typeof ReplayPlaybackEndData>
 
 // ============================================================================
 // MatchInitialized (MatchGuid is REQUIRED)
@@ -226,6 +228,45 @@ export const CrossbarHitData = Schema.Struct({
 export type CrossbarHitDataType = Schema.Schema.Type<typeof CrossbarHitData>
 
 // ============================================================================
+// BoostPickup Event Data
+// ============================================================================
+
+export const BoostPickupData = Schema.Struct({
+  MatchGuid: Schema.optionalWith(Schema.String, { exact: true }),
+  Player: PlayerInfo,
+  Location: Position3D,
+  BoostAmount: Schema.Number,
+  BoostType: Schema.String,
+  bReplay: Schema.Boolean
+})
+
+export type BoostPickupDataType = Schema.Schema.Type<typeof BoostPickupData>
+
+// ============================================================================
+// PlayerJoined Event Data
+// ============================================================================
+
+export const PlayerJoinedData = Schema.Struct({
+  MatchGuid: Schema.optionalWith(Schema.String, { exact: true }),
+  PlayerName: Schema.String,
+  PrimaryId: Schema.String
+})
+
+export type PlayerJoinedDataType = Schema.Schema.Type<typeof PlayerJoinedData>
+
+// ============================================================================
+// PlayerLeft Event Data
+// ============================================================================
+
+export const PlayerLeftData = Schema.Struct({
+  MatchGuid: Schema.optionalWith(Schema.String, { exact: true }),
+  PlayerName: Schema.String,
+  PrimaryId: Schema.String
+})
+
+export type PlayerLeftDataType = Schema.Schema.Type<typeof PlayerLeftData>
+
+// ============================================================================
 // Wrapper Schemas (Event + Data)
 // ============================================================================
 
@@ -248,8 +289,9 @@ export const GoalReplayEndSchema = Schema.Struct({ Event: Schema.Literal("GoalRe
 export const GoalReplayWillEndSchema = Schema.Struct({ Event: Schema.Literal("GoalReplayWillEnd"), Data: GoalReplayWillEndData })
 export const PodiumStartSchema = Schema.Struct({ Event: Schema.Literal("PodiumStart"), Data: PodiumStartData })
 export const ReplayCreatedSchema = Schema.Struct({ Event: Schema.Literal("ReplayCreated"), Data: ReplayCreatedData })
-export const ReplayPlaybackStartSchema = Schema.Struct({ Event: Schema.Literal("ReplayPlaybackStart"), Data: ReplayPlaybackStartData })
-export const ReplayPlaybackEndSchema = Schema.Struct({ Event: Schema.Literal("ReplayPlaybackEnd"), Data: ReplayPlaybackEndData })
+export const BoostPickupSchema = Schema.Struct({ Event: Schema.Literal("BoostPickup"), Data: BoostPickupData })
+export const PlayerJoinedSchema = Schema.Struct({ Event: Schema.Literal("PlayerJoined"), Data: PlayerJoinedData })
+export const PlayerLeftSchema = Schema.Struct({ Event: Schema.Literal("PlayerLeft"), Data: PlayerLeftData })
 
 // ============================================================================
 // Discriminated Union
@@ -275,8 +317,9 @@ export const AllEvents = Schema.Union(
   GoalReplayWillEndSchema,
   PodiumStartSchema,
   ReplayCreatedSchema,
-  ReplayPlaybackStartSchema,
-  ReplayPlaybackEndSchema
+  BoostPickupSchema,
+  PlayerJoinedSchema,
+  PlayerLeftSchema
 )
 
 export type AllEventsType = Schema.Schema.Type<typeof AllEvents>

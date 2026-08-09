@@ -66,7 +66,9 @@ test('forwards UpdateState event', async (t) => {
       bPowersliding: false,
       bDemolished: true,
       Attacker: { Name: 'PlayerB', Shortcut: 2, TeamNum: 1 },
-      bSupersonic: true
+      bSupersonic: true,
+      Loadout: ['body_grain', 'Skin_bartees', 'Wheel_SoccerBall', 'Boost_AlphaReward', 'None', 'None'],
+      PickupClass: 'SpecialPickup_GrapplingHook_TA'
     }],
     Game: {
       Teams: [{ Name: 'Blue', TeamNum: 0, Score: 1, ColorPrimary: '0000FF', ColorSecondary: '0000AA' }],
@@ -98,6 +100,9 @@ test('forwards UpdateState event', async (t) => {
   t.ok(data.Game.Teams[0].Score === 1)
   t.ok(data.Game.Ball.Speed === 850.5)
   t.ok(data.Game.Arena === 'Stadium_P')
+  t.ok(Array.isArray(data.Players[0].Loadout))
+  t.ok(data.Players[0].Loadout.length === 6)
+  t.ok(data.Players[0].PickupClass === 'SpecialPickup_GrapplingHook_TA')
 })
 
 test('forwards GoalScored event with Assister', async (t) => {
@@ -475,15 +480,22 @@ test('forwards ReplayCreated event', async (t) => {
   })
 
   sendEvent(socket, 'ReplayCreated', {
-    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'
+    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6',
+    FileName: 'Stadium_P_2026-06-05_18-42',
+    Date: '2026-06-05 18:42:13'
   })
 
   const [data] = await once(connection, 'ReplayCreated')
 
   t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
+  t.ok(data.FileName === 'Stadium_P_2026-06-05_18-42')
+  t.ok(data.Date instanceof Date)
+  t.ok(data.Date.getFullYear() === 2026)
+  t.ok(data.Date.getMonth() === 5)
+  t.ok(data.Date.getDate() === 5)
 })
 
-test('forwards ReplayPlaybackStart event', async (t) => {
+test('forwards BoostPickup event', async (t) => {
   const { server, socket, connection } = await createServerAndConnection()
 
   t.teardown(async () => {
@@ -491,16 +503,26 @@ test('forwards ReplayPlaybackStart event', async (t) => {
     server.close()
   })
 
-  sendEvent(socket, 'ReplayPlaybackStart', {
-    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'
+  sendEvent(socket, 'BoostPickup', {
+    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6',
+    Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
+    Location: { X: -3072, Y: 0, Z: 73 },
+    BoostAmount: 100,
+    BoostType: 'BoostType_Pill',
+    bReplay: false
   })
 
-  const [data] = await once(connection, 'ReplayPlaybackStart')
+  const [data] = await once(connection, 'BoostPickup')
 
   t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
+  t.ok(data.Player.Name === 'PlayerA')
+  t.ok(data.Location.X === -3072)
+  t.ok(data.BoostAmount === 100)
+  t.ok(data.BoostType === 'BoostType_Pill')
+  t.ok(data.bReplay === false)
 })
 
-test('forwards ReplayPlaybackEnd event', async (t) => {
+test('forwards PlayerJoined event', async (t) => {
   const { server, socket, connection } = await createServerAndConnection()
 
   t.teardown(async () => {
@@ -508,13 +530,38 @@ test('forwards ReplayPlaybackEnd event', async (t) => {
     server.close()
   })
 
-  sendEvent(socket, 'ReplayPlaybackEnd', {
-    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'
+  sendEvent(socket, 'PlayerJoined', {
+    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6',
+    PlayerName: 'PlayerA',
+    PrimaryId: 'Steam|123|0'
   })
 
-  const [data] = await once(connection, 'ReplayPlaybackEnd')
+  const [data] = await once(connection, 'PlayerJoined')
 
   t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
+  t.ok(data.PlayerName === 'PlayerA')
+  t.ok(data.PrimaryId === 'Steam|123|0')
+})
+
+test('forwards PlayerLeft event', async (t) => {
+  const { server, socket, connection } = await createServerAndConnection()
+
+  t.teardown(async () => {
+    await closeConnection(connection)
+    server.close()
+  })
+
+  sendEvent(socket, 'PlayerLeft', {
+    MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6',
+    PlayerName: 'PlayerA',
+    PrimaryId: 'Steam|123|0'
+  })
+
+  const [data] = await once(connection, 'PlayerLeft')
+
+  t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
+  t.ok(data.PlayerName === 'PlayerA')
+  t.ok(data.PrimaryId === 'Steam|123|0')
 })
 
 // ============================================================================
@@ -710,7 +757,9 @@ test('preserves nested data structures', async (t) => {
       bPowersliding: false,
       bDemolished: true,
       Attacker: { Name: 'PlayerB', Shortcut: 2, TeamNum: 1 },
-      bSupersonic: true
+      bSupersonic: true,
+      Loadout: ['body_grain', 'Skin_bartees', 'Wheel_SoccerBall', 'Boost_AlphaReward', 'None', 'None'],
+      PickupClass: 'SpecialPickup_GrapplingHook_TA'
     }],
     Game: {
       Teams: [{ Name: 'Blue', TeamNum: 0, Score: 1, ColorPrimary: '0000FF', ColorSecondary: '0000AA' }],
