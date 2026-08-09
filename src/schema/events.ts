@@ -7,6 +7,24 @@ export type Position3DType = Schema.Schema.Type<typeof Position3D>
 // Shared Primitives
 // ============================================================================
 
+export const PrimaryId = Schema.transform(
+  Schema.String,
+  Schema.Struct({
+    Platform: Schema.String,
+    Uid: Schema.String,
+    Splitscreen: Schema.Number
+  }),
+  {
+    decode: (raw) => {
+      const [Platform, Uid, Splitscreen] = raw.split('|')
+      return { Platform: Platform ?? '', Uid: Uid ?? '', Splitscreen: Number(Splitscreen) || 0 }
+    },
+    encode: ({ Platform, Uid, Splitscreen }) => `${Platform}|${Uid}|${Splitscreen}`
+  }
+)
+
+export type PrimaryIdType = Schema.Schema.Type<typeof PrimaryId>
+
 export const PlayerInfo = Schema.Struct({
   Name: Schema.String,
   Shortcut: Schema.Number,
@@ -27,7 +45,7 @@ export const Position3D = Schema.Struct({
 
 export const UpdateStatePlayer = Schema.Struct({
   Name: Schema.String,
-  PrimaryId: Schema.String,
+  PrimaryId: PrimaryId,
   Shortcut: Schema.Number,
   TeamNum: Schema.Number,
   Score: Schema.Number,
@@ -249,7 +267,7 @@ export type BoostPickupDataType = Schema.Schema.Type<typeof BoostPickupData>
 export const PlayerJoinedData = Schema.Struct({
   MatchGuid: Schema.optionalWith(Schema.String, { exact: true }),
   PlayerName: Schema.String,
-  PrimaryId: Schema.String
+  PrimaryId: PrimaryId
 })
 
 export type PlayerJoinedDataType = Schema.Schema.Type<typeof PlayerJoinedData>
@@ -261,7 +279,7 @@ export type PlayerJoinedDataType = Schema.Schema.Type<typeof PlayerJoinedData>
 export const PlayerLeftData = Schema.Struct({
   MatchGuid: Schema.optionalWith(Schema.String, { exact: true }),
   PlayerName: Schema.String,
-  PrimaryId: Schema.String
+  PrimaryId: PrimaryId
 })
 
 export type PlayerLeftDataType = Schema.Schema.Type<typeof PlayerLeftData>

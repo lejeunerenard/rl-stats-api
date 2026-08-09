@@ -120,6 +120,7 @@ test('extractOneObject - handles complex RLStats UpdateState event', (t) => {
   t.is(result.value.parsed.Data.MatchGuid, 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
   t.is(result.value.parsed.Data.Players.length, 1)
   t.is(result.value.parsed.Data.Players[0].Name, 'PlayerA')
+  t.is(result.value.parsed.Data.Players[0].PrimaryId, 'Steam|123|0')
   t.is(result.value.parsed.Data.Game.Teams[0].Name, 'Blue')
   t.is(result.value.remainder, '')
 })

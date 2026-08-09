@@ -93,7 +93,9 @@ test('forwards UpdateState event', async (t) => {
   t.ok(Array.isArray(data.Players), 'Players is an array')
   t.ok(data.Players.length === 1)
   t.ok(data.Players[0].Name === 'PlayerA')
-  t.ok(data.Players[0].PrimaryId === 'Steam|123|0')
+  t.ok(data.Players[0].PrimaryId.Platform === 'Steam')
+  t.ok(data.Players[0].PrimaryId.Uid === '123')
+  t.ok(data.Players[0].PrimaryId.Splitscreen === 0)
   t.ok(data.Players[0].bHasCar === true)
   t.ok(data.Game.Teams.length === 1)
   t.ok(data.Game.Teams[0].Name === 'Blue')
@@ -540,7 +542,9 @@ test('forwards PlayerJoined event', async (t) => {
 
   t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
   t.ok(data.PlayerName === 'PlayerA')
-  t.ok(data.PrimaryId === 'Steam|123|0')
+  t.ok(data.PrimaryId.Platform === 'Steam')
+  t.ok(data.PrimaryId.Uid === '123')
+  t.ok(data.PrimaryId.Splitscreen === 0)
 })
 
 test('forwards PlayerLeft event', async (t) => {
@@ -561,7 +565,9 @@ test('forwards PlayerLeft event', async (t) => {
 
   t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
   t.ok(data.PlayerName === 'PlayerA')
-  t.ok(data.PrimaryId === 'Steam|123|0')
+  t.ok(data.PrimaryId.Platform === 'Steam')
+  t.ok(data.PrimaryId.Uid === '123')
+  t.ok(data.PrimaryId.Splitscreen === 0)
 })
 
 // ============================================================================
