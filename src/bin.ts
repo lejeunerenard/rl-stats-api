@@ -1,7 +1,8 @@
 import 'bare-encoding/global'
 
 import { header, command, flag } from 'paparam'
-import { Effect, Either, Stream, Layer, ParseResult } from 'effect'
+import { Channel, Effect, Either, Stream, Layer, ParseResult } from 'effect'
+import type { SocketError } from '@effect/platform/Socket'
 import { RLStatsService, RLStatsServiceLive } from './layers/events.js'
 import { ConnectionServiceLive } from './layers/connection.js'
 import { RLStatsConfig } from './layers/config.js'
@@ -25,7 +26,7 @@ const cmd = command(
 
     Effect.runFork(
       Stream.runForEach(
-        service.parsed,
+        Channel.toStream<Either.Either<AllEventsType, ParseResult.ParseError>, SocketError, void, never>(service.parsed as any),
         (parsed: Either.Either<AllEventsType, ParseResult.ParseError>) => {
           Either.match(parsed, {
             onLeft: (error) => {

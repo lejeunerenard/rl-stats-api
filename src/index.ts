@@ -1,7 +1,8 @@
 import 'bare-encoding/global'
 
 import EventEmitter from 'events'
-import { Effect, Either, Stream, Layer, ParseResult } from 'effect'
+import { Channel, Effect, Either, Fiber, Layer, ParseResult, Stream } from 'effect'
+import type { SocketError } from '@effect/platform/Socket'
 import { RLStatsService, RLStatsServiceLive } from './layers/events.js'
 import { ConnectionService, ConnectionServiceLive } from './layers/connection.js'
 import { RLStatsConfig, ConfigLive } from './layers/config.js'
@@ -20,24 +21,21 @@ export type { ConnectionLive } from './layers/connection.js'
 export type { RLStatsLive } from './layers/events.js'
 
 import type { RLStatsLive } from './layers/events.js'
-import type net from 'net'
 
 export class RLStatsAPI extends EventEmitter {
   port: number
   host: string
   private _started: boolean
+  private _stopping: boolean
   private _service: RLStatsLive | null
   private _eventsFiber: ReturnType<typeof Effect.runFork> | null
-
-  get socket() {
-    return this._service?.socket
-  }
 
   constructor(port: number, host: string) {
     super()
     this.port = port
     this.host = host
     this._started = false
+    this._stopping = false
     this._service = null
     this._eventsFiber = null
     this.start().catch(() => {})
@@ -61,12 +59,11 @@ export class RLStatsAPI extends EventEmitter {
 
     this._eventsFiber = Effect.runFork(
       Stream.runForEach(
-        this._service.parsed,
+        Channel.toStream<Either.Either<AllEvents, ParseResult.ParseError>, SocketError, void, never>(this._service.parsed as any),
         (parsed: Either.Either<AllEvents, ParseResult.ParseError>) => {
           Either.match(parsed, {
             onLeft: (error) => {
               this.emit('schema:error', error)
-              // TODO console.error('raw:', parsed.raw)
             },
             onRight: ({ Event, Data }) => {
               this.emit(Event, Data)
@@ -79,13 +76,14 @@ export class RLStatsAPI extends EventEmitter {
   }
 
   async stop() {
-    if (!this._started) return
+    if (!this._started || this._stopping) return
+    this._stopping = true
     this._started = false
-
-    if (this._service) {
-      await Effect.runPromise(this._service.socket).then((socket: net.Socket) => socket.destroy())
-      this._service = null
+    if (this._eventsFiber) {
+      Fiber.interrupt(this._eventsFiber)
+      this._eventsFiber = null
     }
+    this._service = null
   }
 }
 

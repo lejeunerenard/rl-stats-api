@@ -1,6 +1,6 @@
 const test = require('brittle')
 const { once } = require('events')
-const { Effect, Stream, Layer, Either } = require('effect')
+const { Channel, Effect, Stream, Layer, Either } = require('effect')
 const { RLStatsService, RLStatsServiceLive } = require('../dist/layers/events.js')
 const { ConnectionServiceLive } = require('../dist/layers/connection.js')
 const { RLStatsConfig } = require('../dist/layers/config.js')
@@ -26,7 +26,7 @@ test('RLStatsServiceLive emits parsed events', async (t) => {
   const service = await getRLStatsService(port)
 
   Effect.runFork(
-    Stream.runForEach(service.parsed, (parsed) => {
+    Stream.runForEach(Channel.toStream(service.parsed), (parsed) => {
       Either.match(parsed, {
         onLeft: (error) => {
           errors.push(error)
@@ -81,7 +81,7 @@ test('RLStatsServiceLive handles chunked data', async (t) => {
   const service = await getRLStatsService(port)
 
   Effect.runFork(
-    Stream.runForEach(service.parsed, (parsed) => {
+    Stream.runForEach(Channel.toStream(service.parsed), (parsed) => {
       Either.match(parsed, {
         onLeft: () => {},
         onRight: (event) => {
@@ -136,7 +136,7 @@ test('RLStatsServiceLive emits schema errors', async (t) => {
   const service = await getRLStatsService(port)
 
   Effect.runFork(
-    Stream.runForEach(service.parsed, (parsed) => {
+    Stream.runForEach(Channel.toStream(service.parsed), (parsed) => {
       Either.match(parsed, {
         onLeft: (error) => {
           errors.push(error)
@@ -188,7 +188,7 @@ test('RLStatsServiceLive handles multiple events', async (t) => {
   const service = await getRLStatsService(port)
 
   Effect.runFork(
-    Stream.runForEach(service.parsed, (parsed) => {
+    Stream.runForEach(Channel.toStream(service.parsed), (parsed) => {
       Either.match(parsed, {
         onLeft: () => {},
         onRight: (event) => {

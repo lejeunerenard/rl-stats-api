@@ -22,13 +22,13 @@
       "bare": "bare-fs",
       "default": "fs"
     },
-    "net": {
-      "bare": "bare-net",
-      "default": "net"
-    },
     "path": {
       "bare": "bare-path",
       "default": "path"
+    },
+    "net": {
+      "bare": "bare-net",
+      "default": "net"
     },
     "stream": {
       "bare": "bare-stream",
@@ -55,11 +55,14 @@
   "homepage": "https://github.com/lejeunerenard/rl-stats-api",
   "type": "commonjs",
   "dependencies": {
+    "@effect/platform": "^0.97.0",
+    "@effect/platform-node-shared": "^0.61.0",
     "bare-encoding": "^1.0.3",
     "bare-events": "^2.8.2",
     "bare-logger": "^2.0.3",
     "bare-net": "^2.3.1",
     "effect": "^3.22.0",
+    "net": "npm:bare-node-net@^1.0.0",
     "paparam": "^1.10.1"
   },
   "devDependencies": {

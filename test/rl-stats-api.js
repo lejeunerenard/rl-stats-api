@@ -102,7 +102,6 @@ test('forwards UpdateState event', async (t) => {
 
   const [data] = await once(connection, 'UpdateState')
 
-  console.log('beep 7')
   t.ok(data.MatchGuid === 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6')
   t.ok(Array.isArray(data.Players), 'Players is an array')
   t.ok(data.Players.length === 1)

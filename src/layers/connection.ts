@@ -1,14 +1,11 @@
-import { Chunk, Context, Data, Effect, Layer, Option, Stream } from 'effect'
-import net from 'net'
+import { Context, Effect, Layer } from 'effect'
+import { makeNet } from '@effect/platform-node-shared/NodeSocket'
+import * as Socket from '@effect/platform/Socket'
 import { RLStatsConfig } from './config.js'
 
-export class ConnectionRefused extends Data.TaggedError('ConnectionRefused')<{}> {}
-
 export interface ConnectionLive {
-  readonly socket: Effect.Effect<net.Socket>
-  readonly connected: Effect.Effect<void, Error, never>
-  readonly data: Stream.Stream<string, ConnectionRefused, never>
-  readonly closed: Effect.Effect<void, never, never>
+  readonly connected: Effect.Effect<void, Socket.SocketError, never>
+  readonly socket: Socket.Socket
 }
 
 export class ConnectionService extends Context.Tag('@rlstats/Connection')<
@@ -21,47 +18,13 @@ export const ConnectionServiceLive = Layer.effect(
   Effect.gen(function* () {
     const { port, host } = yield* RLStatsConfig
 
-    const socket = net.createConnection(port, host)
+    const socket = yield* makeNet({ port, host })
 
-    const data = Stream.async<string, ConnectionRefused>((emit) => {
-      let connected = false
-      socket.on('connect', () => (connected = true))
-      socket.on('data', (chunk) => {
-        emit(Effect.succeed(Chunk.of(chunk.toString())))
-      })
-      socket.on('close', () => {
-        if (connected) emit(Effect.fail(Option.none()))
-        else emit(Effect.fail(Option.some(new ConnectionRefused())))
-      })
-      return Effect.void
-    })
-
-    const connected = Effect.async<void, Error>((resume) => {
-      const connect = () => {
-        socket.off('error', connectionFailed)
-        socket.off('close', connectionFailed)
-        return resume(Effect.void)
-      }
-      const connectionFailed = (err: Error) => {
-        socket.off('connect', connect)
-        socket.off('error', connectionFailed)
-        socket.off('close', connectionFailed)
-        return resume(Effect.fail(err))
-      }
-      socket.once('connect', connect)
-      socket.once('error', connectionFailed)
-      socket.once('close', connectionFailed)
-    })
-
-    const closed = Effect.async((resume) => {
-      socket.once('close', () => resume(Effect.void))
-    })
+    const connected = Effect.asVoid(Effect.succeed(socket))
 
     return {
-      socket: Effect.succeed(socket),
       connected,
-      data,
-      closed
+      socket
     }
   })
 )

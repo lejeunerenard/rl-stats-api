@@ -1,15 +1,14 @@
-import { Context, Effect, Either, Layer, Stream, ParseResult } from 'effect'
-import net from 'net'
-import { ConnectionService, ConnectionRefused } from './connection.js'
+import { Chunk, Channel, Context, Effect, Either, Layer, ParseResult } from 'effect'
+import { ConnectionService } from './connection.js'
+import type { SocketError } from '@effect/platform/Socket'
+import * as Socket from '@effect/platform/Socket'
 import { decodeAndParse } from '../lib/json-parse-stream.js'
 import { AllEvents } from '../schema/events.js'
 type AllEventsType = typeof AllEvents.Type
 
 export interface RLStatsLive {
-  readonly parsed: Stream.Stream<Either.Either<AllEventsType, ParseResult.ParseError>, ConnectionRefused>
-  readonly socket: Effect.Effect<net.Socket>
-  readonly connected: Effect.Effect<void, Error, never>
-  readonly closed: Effect.Effect<void, never, never>
+  readonly parsed: Channel.Channel<Chunk.Chunk<Either.Either<AllEventsType, ParseResult.ParseError>>, Chunk.Chunk<string | Uint8Array | Socket.CloseEvent>, SocketError, SocketError>
+  readonly connected: Effect.Effect<void, SocketError, never>
 }
 
 export class RLStatsService extends Context.Tag('@rlstats/Events')<RLStatsService, RLStatsLive>() {}
@@ -21,18 +20,18 @@ export const RLStatsServiceLive = Layer.effect(
 
     let _buffer = ''
 
-    const parsed = Stream.flatMap(connection.data, (chunk) => {
-      _buffer += chunk
+    const readChannel = Socket.toChannelMap<SocketError, string>(connection.socket, (data) => data.toString())
+
+    const parsed = Channel.mapOut(readChannel, (chunk) => {
+      _buffer += Chunk.toArray(chunk).join('')
       const { results, remainder } = decodeAndParse(_buffer)
       _buffer = remainder
-      return Stream.fromIterable(results)
+      return Chunk.fromIterable(results)
     })
 
     return {
       parsed,
-      socket: connection.socket,
-      connected: connection.connected,
-      closed: connection.closed
+      connected: connection.connected
     }
   })
 )

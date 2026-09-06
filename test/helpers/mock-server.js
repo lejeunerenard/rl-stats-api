@@ -1,6 +1,5 @@
 const { once } = require('events')
 const net = require('net')
-const { Effect } = require('effect')
 
 const RLStatsAPI = require('../../dist/index.js').default
 
