@@ -23,13 +23,8 @@ function sendEvent(socket, event, data) {
   socket.write(JSON.stringify({ Event: event, Data: data }) + '\n')
 }
 
-async function closeConnection(connection) {
-  const socket = await Effect.runPromise(connection.socket)
-  socket.end()
-  await new Promise((resolve) => {
-    socket.on('close', resolve)
-    setTimeout(resolve, 1000)
-  })
+function closeConnection(connection) {
+  return connection.stop()
 }
 
 async function setupTest(t, port) {

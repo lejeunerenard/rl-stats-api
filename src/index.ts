@@ -59,7 +59,12 @@ export class RLStatsAPI extends EventEmitter {
 
     this._eventsFiber = Effect.runFork(
       Stream.runForEach(
-        Channel.toStream<Either.Either<AllEvents, ParseResult.ParseError>, SocketError, void, never>(this._service.parsed as any),
+        Channel.toStream<
+          Either.Either<AllEvents, ParseResult.ParseError>,
+          SocketError,
+          void,
+          never
+        >(this._service.parsed as any),
         (parsed: Either.Either<AllEvents, ParseResult.ParseError>) => {
           Either.match(parsed, {
             onLeft: (error) => {
@@ -80,7 +85,7 @@ export class RLStatsAPI extends EventEmitter {
     this._stopping = true
     this._started = false
     if (this._eventsFiber) {
-      Fiber.interrupt(this._eventsFiber)
+      await Effect.runPromise(Fiber.interrupt(this._eventsFiber))
       this._eventsFiber = null
     }
     this._service = null

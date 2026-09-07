@@ -1,7 +1,20 @@
 import { Context, Effect, Layer } from 'effect'
 import { makeNet } from '@effect/platform-node-shared/NodeSocket'
 import * as Socket from '@effect/platform/Socket'
+import { Socket as BareSocket } from 'bare-net'
 import { RLStatsConfig } from './config.js'
+
+// HACK BareSocket doesn't use `bare-stream` streams but `streamx` streams which
+// don't have the `.closed` property. Effect's `NodeSocket` uses `.closed` so
+// never closes the socket.
+if (!('closed' in BareSocket.prototype)) {
+  Object.defineProperty(BareSocket.prototype, 'closed', {
+    get(this: BareSocket) {
+      return this.destroyed
+    },
+    configurable: true
+  })
+}
 
 export interface ConnectionLive {
   readonly connected: Effect.Effect<void, Socket.SocketError, never>
