@@ -1,7 +1,7 @@
 import 'bare-encoding/global'
 
 import { header, command, flag } from 'paparam'
-import { Channel, Chunk, Effect, Either, Stream, Layer, ParseResult, Scope } from 'effect'
+import { Channel, Chunk, Console, Effect, Either, Stream, Layer, ParseResult, Scope } from 'effect'
 // import type { SocketError } from '@effect/platform/Socket'
 import { RLStatsService, RLStatsServiceLive } from './layers/events.js'
 import { ConnectionServiceLive } from './layers/connection.js'
@@ -46,30 +46,26 @@ const cmd = command(
       )
     )
 
-    Effect.runFork(
-      Stream.runForEach(
-        channelToStream(service.parsed),
-        (parsed: Either.Either<AllEventsType, ParseResult.ParseError>) => {
-          Either.match(parsed, {
-            onLeft: (error) => {
-              console.error('schema error:', error)
-              // TODO console.error('raw:', parsed.raw)
-            },
-            onRight: ({ Event, Data }) => {
-              const json = JSON.stringify(Data, null, 2)
-              if (Event === 'UpdateState') {
-                console.log('UpdateState', json)
-              } else if (Event === 'GoalScored') {
-                console.log('GoalScored', json)
-              } else if (Event === 'BallHit') {
-                console.log('BallHit', json)
-              }
-            }
-          })
-          return Effect.succeed(undefined)
+    const parsedToLog = (parsed: Either.Either<AllEventsType, ParseResult.ParseError>) =>
+      Either.match(parsed, {
+        onLeft: (error) => {
+          return Console.error('schema error:', error)
+          // TODO console.error('raw:', parsed.raw)
+        },
+        onRight: ({ Event, Data }) => {
+          const json = JSON.stringify(Data, null, 2)
+          if (Event === 'UpdateState') {
+            return Console.log('UpdateState', json)
+          } else if (Event === 'GoalScored') {
+            return Console.log('GoalScored', json)
+          } else if (Event === 'BallHit') {
+            return Console.log('BallHit', json)
+          }
+          return Effect.void
         }
-      )
-    )
+      })
+
+    Effect.runFork(Stream.runForEach(channelToStream(service.parsed), parsedToLog))
   }
 )
 
