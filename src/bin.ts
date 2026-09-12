@@ -1,8 +1,16 @@
 import 'bare-encoding/global'
 
 import { header, command, flag } from 'paparam'
-import { Channel, Console, Effect, Either, Sink, Layer, ParseResult } from 'effect'
-// import type { SocketError } from '@effect/platform/Socket'
+import {
+  Console,
+  Effect,
+  Either,
+  Fiber,
+  Stream,
+  Layer,
+  ParseResult,
+  Queue
+} from 'effect'
 import { RLStatsService, RLStatsServiceLive } from './layers/events.js'
 import { ConnectionServiceLive } from './layers/connection.js'
 import { RLStatsConfig } from './layers/config.js'
@@ -16,13 +24,6 @@ const cmd = command(
   async (cmd) => {
     const port = Number(cmd.flags.port) || 49123
     const host = cmd.flags.host || '127.0.0.1'
-
-    const service = await Effect.runPromise(
-      Effect.provide(RLStatsService, RLStatsServiceLive).pipe(
-        Effect.provide(ConnectionServiceLive),
-        Effect.provide(Layer.succeed(RLStatsConfig, { port, host }))
-      )
-    )
 
     const parsedToLog = (parsed: Either.Either<AllEventsType, ParseResult.ParseError>) =>
       Either.match(parsed, {
@@ -43,8 +44,27 @@ const cmd = command(
         }
       })
 
-    const sinkToLog = Sink.forEach(parsedToLog)
-    Effect.runFork(Channel.run(Channel.pipeTo(service.parsed, Sink.toChannel(sinkToLog))))
+    const program = Effect.gen(function* () {
+      const requests = yield* Queue.unbounded<string>()
+      const { parsed } = yield* RLStatsService
+
+      const fiber = yield* Stream.fromQueue(requests).pipe(
+        Stream.pipeThroughChannel(parsed),
+        Stream.runForEach(parsedToLog),
+        Effect.forkDaemon
+      )
+
+      yield* Fiber.await(fiber)
+    })
+
+    const connectionLayer = ConnectionServiceLive.pipe(
+      Layer.provide(Layer.succeed(RLStatsConfig, { port, host }))
+    )
+    const rlStatsLayer = RLStatsServiceLive.pipe(
+      Layer.provide(connectionLayer),
+    )
+
+    await Effect.runPromise(program.pipe(Effect.provide(rlStatsLayer)))
   }
 )
 
