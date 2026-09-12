@@ -26,7 +26,7 @@ const cmd = command(
 
     Effect.runFork(
       Stream.runForEach(
-        Channel.toStream<Either.Either<AllEventsType, ParseResult.ParseError>, SocketError, void, never>(service.parsed as any),
+        Channel.toStream<Either.Either<AllEventsType, ParseResult.ParseError>, SocketError, void, never>(service.parsed),
         (parsed: Either.Either<AllEventsType, ParseResult.ParseError>) => {
           Either.match(parsed, {
             onLeft: (error) => {
