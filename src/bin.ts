@@ -3,10 +3,12 @@ import 'bare-encoding/global'
 import { header, command, flag } from 'paparam'
 import {
   Console,
+  Cause,
+  Exit,
   Effect,
   Either,
-  Fiber,
   Stream,
+  Schedule,
   Layer,
   ParseResult,
   Queue
@@ -48,23 +50,26 @@ const cmd = command(
       const requests = yield* Queue.unbounded<string>()
       const { parsed } = yield* RLStatsService
 
-      const fiber = yield* Stream.fromQueue(requests).pipe(
+      yield* Stream.fromQueue(requests).pipe(
         Stream.pipeThroughChannel(parsed),
-        Stream.runForEach(parsedToLog),
-        Effect.forkDaemon
+        Stream.runForEach(parsedToLog)
       )
-
-      yield* Fiber.await(fiber)
     })
 
     const connectionLayer = ConnectionServiceLive.pipe(
       Layer.provide(Layer.succeed(RLStatsConfig, { port, host }))
     )
-    const rlStatsLayer = RLStatsServiceLive.pipe(
-      Layer.provide(connectionLayer),
-    )
+    const rlStatsLayer = RLStatsServiceLive.pipe(Layer.provide(connectionLayer))
 
-    await Effect.runPromise(program.pipe(Effect.provide(rlStatsLayer)))
+    const re = await Effect.runPromiseExit(
+      program.pipe(Effect.provide(rlStatsLayer), Effect.retry(Schedule.spaced('1 second')))
+    )
+    console.log(
+      Exit.match(re, {
+        onFailure: (cause) => `Exited with failure state: ${Cause.pretty(cause)}`,
+        onSuccess: (value) => `Exited with success value: ${value}`
+      })
+    )
   }
 )
 
