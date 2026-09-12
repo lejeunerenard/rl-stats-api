@@ -1,12 +1,34 @@
 import 'bare-encoding/global'
 
 import { header, command, flag } from 'paparam'
-import { Channel, Effect, Either, Stream, Layer, ParseResult } from 'effect'
-import type { SocketError } from '@effect/platform/Socket'
+import { Channel, Chunk, Effect, Either, Stream, Layer, ParseResult, Scope } from 'effect'
+// import type { SocketError } from '@effect/platform/Socket'
 import { RLStatsService, RLStatsServiceLive } from './layers/events.js'
 import { ConnectionServiceLive } from './layers/connection.js'
 import { RLStatsConfig } from './layers/config.js'
 import type { AllEventsType } from './schema/events.js'
+
+function channelToStream<OutElemInner, InElem, OutErr, InErr, OutDone, InDone, Env>(
+  channel: Channel.Channel<Chunk.Chunk<OutElemInner>, InElem, OutErr, InErr, OutDone, InDone, Env>
+): Stream.Stream<OutElemInner, OutErr, Env> {
+  return Stream.unwrapScoped(
+    Effect.flatMap(Scope.make(), (scope) =>
+      Effect.flatMap(Channel.toPullIn(channel, scope), (pull) => {
+        const loop = (): Stream.Stream<OutElemInner, OutErr, Env> =>
+          Stream.unwrap(
+            Effect.flatMap(pull, (result) => {
+              if (Either.isLeft(result)) {
+                return Stream.fromIterable(Chunk.flatten(result.left)).pipe(Stream.concat(loop()))
+              } else {
+                return Stream.empty
+              }
+            })
+          )
+        return loop()
+      })
+    )
+  )
+}
 
 const cmd = command(
   'rl-stats-api-cli',
@@ -26,7 +48,7 @@ const cmd = command(
 
     Effect.runFork(
       Stream.runForEach(
-        Channel.toStream<Either.Either<AllEventsType, ParseResult.ParseError>, SocketError, void, never>(service.parsed),
+        channelToStream(service.parsed),
         (parsed: Either.Either<AllEventsType, ParseResult.ParseError>) => {
           Either.match(parsed, {
             onLeft: (error) => {
