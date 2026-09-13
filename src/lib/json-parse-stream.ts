@@ -93,7 +93,7 @@ export function decodeAndParse(str: string): {
     const result = extractOneObject(buffer)
     if (!Option.isSome(result)) break
 
-    const { parsed, raw, remainder } = result.value
+    const { parsed, remainder } = result.value
     buffer = remainder
 
     const normalized = normalizeEventData(parsed)
