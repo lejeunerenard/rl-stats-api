@@ -17,8 +17,13 @@ export function extractOneObject(working: string): Option.Option<ExtractedObject
   }
   if (start === working.length) return Option.none()
 
-  const startChar = working[start]
-  const endChar = startChar === '[' ? ']' : startChar === '{' ? '}' : null
+  // Skip until there is a valid start character (aka the endChar is selected)
+  let endChar: ']' | '}' | null = null
+  while (start < working.length && !endChar) {
+    const startChar = working[start]
+    endChar = startChar === '[' ? ']' : startChar === '{' ? '}' : null
+    if (!endChar) start++
+  }
   if (!endChar) return Option.none()
 
   let depth = 0
@@ -50,7 +55,7 @@ export function extractOneObject(working: string): Option.Option<ExtractedObject
     } else if (char === '}' || char === ']') {
       depth--
       if (depth === 0) {
-        const str = working.substring(0, i + 1)
+        const str = working.substring(start, i + 1)
         try {
           const obj = JSON.parse(str)
           return Option.some({ parsed: obj, raw: str, remainder: working.substring(i + 1) })

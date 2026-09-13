@@ -31,6 +31,18 @@ test('parseJSONStream - parse json even when emitted with start of next', (t) =>
   t.alike(result, [{ foo: 'bar' }, { biz: 'baz' }], 'returns two objs')
 })
 
+test('extractOneObject - leading whitespace', (t) => {
+  const input = ' \n{ "valid": "bar" }{ "valid": "baz" }'
+  const result = parseAll(input)
+  t.alike(result, [{ valid: 'bar' }, { valid: 'baz' }], 'returns two objs skipping whitespace')
+})
+
+test('extractOneObject - remove json up to valid opening character', (t) => {
+  const input = '{ "valid": "bar" }}{ "valid": "baz" }'
+  const result = parseAll(input)
+  t.alike(result, [{ valid: 'bar' }, { valid: 'baz' }], 'returns two objs skipping extra }')
+})
+
 test('parseJSONStream - handles split across multiple writes', (t) => {
   const json = JSON.stringify({
     Event: 'GoalScored',
