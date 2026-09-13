@@ -51,9 +51,9 @@ test('parseJSONStream - handles split across multiple writes', (t) => {
   }
 
   const result = parseAll(buffer)
-  t.ok(result.length === 1)
-  t.ok(result[0].Event === 'GoalScored')
-  t.ok(result[0].Data.GoalSpeed === 87.3)
+  t.is(result.length, 1)
+  t.is(result[0].Event, 'GoalScored')
+  t.is(result[0].Data.GoalSpeed, 87.3)
 })
 
 test('parseJSONStream - handles multiple events in single input', (t) => {
@@ -80,9 +80,9 @@ test('parseJSONStream - handles multiple events in single input', (t) => {
 
   const input = event1 + '\n' + event2
   const result = parseAll(input)
-  t.ok(result.length === 2)
-  t.ok(result[0].Event === 'GoalScored')
-  t.ok(result[1].Event === 'BallHit')
+  t.is(result.length, 2, 'got 2 results')
+  t.is(result[0].Event, 'GoalScored', 'first event correct')
+  t.is(result[1].Event, 'BallHit', 'second event correct')
 })
 
 function parseAll(input) {
