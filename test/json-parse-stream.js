@@ -5,20 +5,6 @@ const { Option } = require('effect')
 const { join } = require('path')
 const { extractOneObject } = require('../dist/lib/json-parse-stream.js')
 
-function parseAll(input) {
-  const results = []
-  let buffer = input
-  let result
-  do {
-    result = extractOneObject(buffer)
-    if (Option.isSome(result)) {
-      results.push(result.value.parsed)
-      buffer = result.value.remainder
-    }
-  } while (Option.isSome(result))
-  return results
-}
-
 test('parseJSONStream - parses json 100bytes at a time', (t) => {
   const fixturePath = join(__dirname, './fixtures/update-state-simple.json')
   const fs = require('fs')
@@ -98,3 +84,17 @@ test('parseJSONStream - handles multiple events in single input', (t) => {
   t.ok(result[0].Event === 'GoalScored')
   t.ok(result[1].Event === 'BallHit')
 })
+
+function parseAll(input) {
+  const results = []
+  let buffer = input
+  let result
+  do {
+    result = extractOneObject(buffer)
+    if (Option.isSome(result)) {
+      results.push(result.value.parsed)
+      buffer = result.value.remainder
+    }
+  } while (Option.isSome(result))
+  return results
+}
