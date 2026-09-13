@@ -1,9 +1,9 @@
 const test = require('brittle')
 require('bare-encoding/global')
 
-const { Option } = require('effect')
+const { Option, Either, ParseResult } = require('effect')
 const { join } = require('path')
-const { extractOneObject } = require('../dist/lib/json-parse-stream.js')
+const { decodeAndParse, extractOneObject } = require('../dist/lib/json-parse-stream.js')
 
 test('parseJSONStream - parses json 100bytes at a time', (t) => {
   const fixturePath = join(__dirname, './fixtures/update-state-simple.json')
@@ -83,6 +83,50 @@ test('parseJSONStream - handles multiple events in single input', (t) => {
   t.is(result.length, 2, 'got 2 results')
   t.is(result[0].Event, 'GoalScored', 'first event correct')
   t.is(result[1].Event, 'BallHit', 'second event correct')
+})
+
+test('decodeAndParse - basic', (t) => {
+  const event1 = JSON.stringify({
+    Event: 'GoalScored',
+    Data: {
+      MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6',
+      GoalSpeed: 87.3,
+      GoalTime: 127.5,
+      ImpactLocation: { X: 0, Y: -2944, Z: 320 },
+      Scorer: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 },
+      BallLastTouch: { Player: { Name: 'PlayerA', Shortcut: 1, TeamNum: 0 }, Speed: 125 }
+    }
+  })
+
+  const event2 = JSON.stringify({
+    Event: 'BallHit',
+    Data: {
+      MatchGuid: 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6',
+      Players: [{ Name: 'PlayerB', Shortcut: 2, TeamNum: 1 }],
+      Ball: { PreHitSpeed: 100, PostHitSpeed: 1450.2, Location: { X: -512, Y: 100, Z: 200 } }
+    }
+  })
+
+  const event3 = JSON.stringify({
+    Event: 'Unsupported',
+    Data: {}
+  })
+
+  const input = [event1, event2, event3].join('\n')
+  const { results, remainder } = decodeAndParse(input)
+  t.is(results.length, 3, 'got 3 results')
+  t.ok(results.every((r) => Either.isEither(r)), 'all results are Eithers')
+
+  const [good1, good2, bad1] = results
+
+  t.is(Either.getOrElse(good1, () => ({})).Event, 'GoalScored')
+  t.is(Either.getOrElse(good2, () => ({})).Event, 'BallHit')
+
+  t.ok(Either.isLeft(bad1), 'Bad message returns left either')
+  const bad1Value = Option.getOrElse(Either.getLeft(bad1), () => ({}))
+  t.ok(ParseResult.isParseError(bad1Value), 'returns a parse error')
+
+  t.is(remainder, '', 'remainder is empty')
 })
 
 function parseAll(input) {
